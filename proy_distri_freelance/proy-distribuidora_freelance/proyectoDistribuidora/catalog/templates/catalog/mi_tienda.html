@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Mi tienda{% endblock %}
+{% block content %}
+<p><a href="{% url 'configuracion' %}">← Configuración</a></p>
+
+{% if tienda is None %}
+<div class="form-card">
+  <div class="form-card__body">
+    <p class="form-hint">Aún no tienes una tienda registrada. Contacta a tu distribuidor.</p>
+  </div>
+</div>
+{% else %}
+<div class="form-card">
+  <div class="form-card__header">
+    <h3>Mi tienda — {{ tienda.name }}</h3>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-card__body">
+      {{ formulario.non_field_errors }}
+      <div class="form-grid">
+        {% for field in formulario.visible_fields %}
+          <div class="form-field">
+            {{ field.label_tag }}{{ field }}
+            {% if field.help_text %}<small class="form-field__help">{{ field.help_text }}</small>{% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+      </div>
+      {% for hidden in formulario.hidden_fields %}{{ hidden }}{% endfor %}
+      <p class="form-hint" style="margin-top:16px;"><strong>Ubicación</strong> — busca la dirección o haz clic en el mapa para ajustar el marcador</p>
+      <div id="location-picker-map" class="map-picker"></div>
+    </div>
+    <div class="form-card__footer">
+      <button type="submit">Guardar cambios</button>
+      <a class="btn btn-secondary" href="{% url 'configuracion' %}">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script>
+  window.PICKER_CFG = {
+    lat: {{ tienda.latitude|default:"null" }},
+    lng: {{ tienda.longitude|default:"null" }}
+  };
+</script>
+<script src="{% static 'js/location_picker.js' %}"></script>
+{% endif %}
+{% endblock %}

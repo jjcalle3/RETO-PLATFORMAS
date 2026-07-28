@@ -1,0 +1,41 @@
+{% comment %}
+Reusable form card for simple field-list forms. Renders the form into the
+.form-card chrome (header / grid body / footer) defined in styles.css.
+
+Params (via {% include ... with %}):
+  formulario    — the Django form instance
+  title         — card header text (optional)
+  submit_label  — submit button label (default "Guardar")
+  cancel_url    — href for a secondary "Cancelar" link (optional)
+  multipart     — truthy if the form contains a file field
+  confirm       — if set, a JS confirm() message shown on submit
+  hidden_section — if set, a hidden <input name="section"> for multi-form pages
+{% endcomment %}
+<div class="form-card">
+  {% if title %}<div class="form-card__header"><h3>{{ title }}</h3></div>{% endif %}
+  <form method="post"{% if multipart %} enctype="multipart/form-data"{% endif %}{% if confirm %} onsubmit="return confirm('{{ confirm|escapejs }}')"{% endif %}>
+    {% csrf_token %}
+    {% if hidden_section %}<input type="hidden" name="section" value="{{ hidden_section }}">{% endif %}
+    <div class="form-card__body">
+      {{ formulario.non_field_errors }}
+      <div class="form-grid">
+        {% for field in formulario.visible_fields %}
+          <div class="form-field{% if field.field.widget.input_type == 'checkbox' %} form-field--check{% endif %}">
+            {% if field.field.widget.input_type == 'checkbox' %}
+              {{ field }}{{ field.label_tag }}
+            {% else %}
+              {{ field.label_tag }}{{ field }}
+            {% endif %}
+            {% if field.help_text %}<small class="form-field__help">{{ field.help_text }}</small>{% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+      </div>
+      {% for hidden in formulario.hidden_fields %}{{ hidden }}{% endfor %}
+    </div>
+    <div class="form-card__footer">
+      <button type="submit">{{ submit_label|default:"Guardar" }}</button>
+      {% if cancel_url %}<a class="btn btn-secondary" href="{{ cancel_url }}">Cancelar</a>{% endif %}
+    </div>
+  </form>
+</div>

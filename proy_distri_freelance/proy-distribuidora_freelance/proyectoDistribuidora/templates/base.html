@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>{% block title %}ISBEN Solutions{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    <div class="app-shell">
+      {% if user.is_authenticated %}
+      {# DESIGN.md "Navigation": left sidebar on desktop, collapses to a bottom tab bar at <1024px — same markup, CSS relayouts it. #}
+      <nav class="app-nav" aria-label="Navegación principal">
+        <ul>
+          {% if user.is_superuser %}
+            {% url 'operator_dashboard' as url_operator_dashboard %}
+            <li><a href="{{ url_operator_dashboard }}" {% if request.path == url_operator_dashboard %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>
+              <span>Panel de operador</span>
+            </a></li>
+            {% url 'crear_distribuidor' as url_crear_distribuidor %}
+            <li><a href="{{ url_crear_distribuidor }}" {% if request.path == url_crear_distribuidor %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4 17V4h8v13"/><path d="M12 9h5v8"/><path d="M6 7h2M6 10h2M6 13h2"/><path d="M15.5 4v4M13.5 6h4"/></svg>
+              <span>Crear distribuidor</span>
+            </a></li>
+            {% url 'invitaciones' as url_invitaciones %}
+            <li><a href="{{ url_invitaciones }}" {% if request.path == url_invitaciones %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><rect x="3" y="5" width="14" height="10" rx="1.5"/><path d="M3.5 6l6.5 5 6.5-5"/></svg>
+              <span>Invitaciones</span>
+            </a></li>
+          {% elif user.role == 'DISTRIBUTOR' %}
+            {% url 'distributor_dashboard' as url_dashboard %}
+            <li><a href="{{ url_dashboard }}" {% if request.path == url_dashboard %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>
+              <span>Dashboard</span>
+            </a></li>
+            {% url 'index_productos' as url_productos %}
+            {% url 'index_categorias' as url_categorias %}
+            {% url 'index_marcas' as url_marcas %}
+            {% url 'importar_productos' as url_importar %}
+            {% url 'mapa_tiendas' as url_mapa %}
+            <li>
+              <details class="nav-group" {% if '/catalog/' in request.path and '/catalog/inventory/' not in request.path %}open{% endif %}>
+                <summary>
+                  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 6.5 10 3l7 3.5-7 3.5-7-3.5z"/><path d="M3 6.5v7l7 3.5 7-3.5v-7"/><path d="M10 10v6.5"/></svg>
+                  <span>Catálogo</span>
+                  <svg class="nav-caret" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 5l5 5-5 5"/></svg>
+                </summary>
+                <ul class="nav-sub">
+                  <li><a href="{{ url_productos }}" {% if request.path == url_productos %}aria-current="page"{% endif %}>Productos</a></li>
+                  <li><a href="{{ url_categorias }}" {% if request.path == url_categorias %}aria-current="page"{% endif %}>Categorías</a></li>
+                  <li><a href="{{ url_marcas }}" {% if request.path == url_marcas %}aria-current="page"{% endif %}>Marcas</a></li>
+                  <li><a href="{{ url_importar }}" {% if request.path == url_importar %}aria-current="page"{% endif %}>Importar CSV</a></li>
+                  <li><a href="{{ url_mapa }}" {% if request.path == url_mapa %}aria-current="page"{% endif %}>Mapa de tiendas</a></li>
+                </ul>
+              </details>
+            </li>
+            {% url 'inventario' as url_inventario %}
+            <li><a href="{{ url_inventario }}" {% if request.path == url_inventario %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><rect x="3" y="8" width="6" height="6" rx="1"/><rect x="11" y="8" width="6" height="6" rx="1"/><rect x="7" y="2.5" width="6" height="5" rx="1"/></svg>
+              <span>Inventario</span>
+            </a></li>
+            {% url 'index_orders' as url_orders %}
+            <li><a href="{{ url_orders }}" {% if request.path == url_orders %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4 4h12M4 9h12M4 14h8"/></svg>
+              <span>Pedidos</span>
+            </a></li>
+            {% url 'index_accounts' as url_accounts %}
+            <li><a href="{{ url_accounts }}" {% if request.path == url_accounts %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="7.5" cy="6.5" r="3"/><path d="M2 17c0-3 2.5-5.5 5.5-5.5S13 14 13 17"/><circle cx="15" cy="8" r="2.2"/><path d="M13.5 17c0-2.3 1-4 2.5-4.8"/></svg>
+              <span>Usuarios</span>
+            </a></li>
+            {% url 'index_audit' as url_audit %}
+            <li><a href="{{ url_audit }}" {% if request.path == url_audit %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>
+              <span>Auditoría</span>
+            </a></li>
+            {% url 'notificaciones' as url_notifs %}
+            <li><a href="{{ url_notifs }}" {% if request.path == url_notifs %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 14.5v-4.5a5 5 0 0 1 10 0v4.5l1.5 2h-13l1.5-2z"/><path d="M8.3 18.5a1.7 1.7 0 0 0 3.4 0"/></svg>
+              <span>Notificaciones{% if unread_notification_count %} ({{ unread_notification_count }}){% endif %}</span>
+            </a></li>
+          {% elif user.role == 'VENDOR' or user.role == 'STORE_OWNER' %}
+            {% if user.role == 'STORE_OWNER' %}
+              {% url 'explorar_productos' as url_explorar %}
+              <li><a href="{{ url_explorar }}" {% if request.path == url_explorar %}aria-current="page"{% endif %}>
+                <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5"/><path d="M16 16l-3.2-3.2"/></svg>
+                <span>Explorar Productos</span>
+              </a></li>
+              {% url 'carrito' as url_carrito %}
+              <li><a href="{{ url_carrito }}" {% if request.path == url_carrito %}aria-current="page"{% endif %}>
+                <span class="nav-icon-badge">
+                  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="7" cy="17" r="1.4"/><circle cx="15" cy="17" r="1.4"/><path d="M2 3h2l2 11h10l2-8H6"/></svg>
+                  {% if cart_items_count %}<span class="nav-badge">{{ cart_items_count }}</span>{% endif %}
+                </span>
+                <span>Carrito</span>
+              </a></li>
+            {% endif %}
+            {% url 'index_orders' as url_orders %}
+            <li><a href="{{ url_orders }}" {% if request.path == url_orders %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4 4h12M4 9h12M4 14h8"/></svg>
+              <span>Pedidos</span>
+            </a></li>
+            {% url 'notificaciones' as url_notifs %}
+            <li><a href="{{ url_notifs }}" {% if request.path == url_notifs %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 14.5v-4.5a5 5 0 0 1 10 0v4.5l1.5 2h-13l1.5-2z"/><path d="M8.3 18.5a1.7 1.7 0 0 0 3.4 0"/></svg>
+              <span>Notificaciones{% if unread_notification_count %} ({{ unread_notification_count }}){% endif %}</span>
+            </a></li>
+          {% elif user.role == 'DELIVERY' %}
+            {% url 'index_deliveries' as url_deliveries %}
+            <li><a href="{{ url_deliveries }}" {% if request.path == url_deliveries %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M2 6h9v8H2z"/><path d="M11 9h4l3 3v2h-7z"/><circle cx="6" cy="16" r="1.6"/><circle cx="16" cy="16" r="1.6"/></svg>
+              <span>Entregas</span>
+            </a></li>
+            {% url 'notificaciones' as url_notifs %}
+            <li><a href="{{ url_notifs }}" {% if request.path == url_notifs %}aria-current="page"{% endif %}>
+              <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 14.5v-4.5a5 5 0 0 1 10 0v4.5l1.5 2h-13l1.5-2z"/><path d="M8.3 18.5a1.7 1.7 0 0 0 3.4 0"/></svg>
+              <span>Notificaciones{% if unread_notification_count %} ({{ unread_notification_count }}){% endif %}</span>
+            </a></li>
+          {% endif %}
+          {# Configuración — self-service settings, available to every role #}
+          {% url 'configuracion' as url_config %}
+          <li><a href="{{ url_config }}" {% if request.path == url_config %}aria-current="page"{% endif %}>
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="2.5"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4"/></svg>
+            <span>Configuración</span>
+          </a></li>
+        </ul>
+      </nav>
+      {% endif %}
+
+      <div class="app-main">
+        <header>
+          <div class="header-row">
+          <a href="{% url 'home' %}" class="brand">
+            <img src="{% static 'media/iso_1.png' %}" alt="" class="brand-mark" width="26" height="26">
+            <span class="brand-word">ISBEN <em>Solutions</em></span>
+          </a>
+          {% if not user.is_authenticated %}
+          <nav aria-label="Enlace de inicio">
+            <ul>
+              <li><a href="{% url 'home' %}">Inicio</a></li>
+            </ul>
+          </nav>
+          {% endif %}
+          <div class="session-bar">
+            {% if user.is_authenticated %}
+              <span>Conectado como {{ user.email }}{% if user.role %} ({{ user.get_role_display }}){% endif %}</span>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="linklike">Cerrar sesión</button>
+              </form>
+            {% else %}
+              <span></span>
+              <a href="{% url 'login' %}">Iniciar sesión</a>
+            {% endif %}
+          </div>
+          </div>
+        </header>
+
+        <section class="page-section {% block content_class %}page-section--padded{% endblock %}">
+          {% if messages %}
+            {% for message in messages %}
+              <p class="{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
+          {% block content %}{% endblock %}
+        </section>
+
+        <footer>
+          <div class="footer-inner">
+            <p>Loja — Ecuador</p>
+            <p>{% now "j F Y H:i" %}</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script>
+      $(function () {
+        $('table.datatable').each(function () {
+          var $table = $(this);
+          var $headers = $table.find('thead th');
+          var colCount = $headers.length;
+          var emptyMessage = null;
+
+          // Django templates render a single "no data yet" row with a
+          // colspan-ed <td> when a queryset is empty. DataTables' automatic
+          // column detection expects every row to have one <td> per header
+          // column, so that placeholder row crashes init unless we pull its
+          // message out and remove it before handing the table over.
+          var $rows = $table.find('tbody tr');
+          if ($rows.length === 1) {
+            var $cells = $rows.first().children('td');
+            if ($cells.length === 1 && parseInt($cells.attr('colspan'), 10) >= colCount) {
+              emptyMessage = $cells.html();
+              $rows.first().remove();
+            }
+          }
+
+          // A table opts into a sort key that isn't its visible text (e.g.
+          // needs-action-first ordering, DESIGN.md "Sort/priority") by
+          // adding <th class="dt-hidden"> sort-key columns and a
+          // data-order='[[colIndex,"asc"], ...]' attribute on the <table>.
+          var columnDefs = [];
+          var hiddenTargets = [];
+          $headers.each(function (index) {
+            if ($(this).hasClass('dt-hidden')) {
+              hiddenTargets.push(index);
+            }
+          });
+          if (hiddenTargets.length) {
+            columnDefs.push({ targets: hiddenTargets, visible: false });
+          }
+          var order = [];
+          var orderAttr = $table.attr('data-order');
+          if (orderAttr) {
+            order = JSON.parse(orderAttr);
+          }
+
+          // A table with its own server-side search field (data-server-search)
+          // opts out of DataTables' client-side search box — the page would
+          // otherwise show two "search" inputs with different scopes.
+          var serverSearch = $table.attr('data-server-search') === 'true';
+
+          $table.DataTable({
+            language: {
+              search: "Buscar:",
+              lengthMenu: "Mostrar _MENU_ filas",
+              info: "Mostrando _START_ a _END_ de _TOTAL_",
+              infoEmpty: "Sin registros",
+              infoFiltered: "(filtrado de _MAX_ registros totales)",
+              zeroRecords: "Sin resultados coincidentes",
+              emptyTable: emptyMessage || "No hay datos disponibles.",
+              paginate: { first: "Primero", last: "Último", next: "Siguiente", previous: "Anterior" }
+            },
+            order: order,
+            columnDefs: columnDefs,
+            pageLength: 10,
+            lengthChange: false,
+            searching: !serverSearch
+          });
+        });
+      });
+    </script>
+    <script>
+      // File dropzones: reflect the chosen filename(s) and highlight on drag.
+      // The native <input type=file> sits transparent over the label, so drops
+      // and clicks work without manual file wiring — this only updates the UI.
+      document.querySelectorAll('.file-dropzone').forEach(function (zone) {
+        var input = zone.querySelector('input[type=file]');
+        var hint = zone.querySelector('.file-dropzone__hint');
+        if (!input || !hint) return;
+        var placeholder = hint.getAttribute('data-placeholder') || hint.textContent;
+        input.addEventListener('change', function () {
+          if (input.files && input.files.length === 1) {
+            hint.textContent = input.files[0].name;
+          } else if (input.files && input.files.length > 1) {
+            hint.textContent = input.files.length + ' archivos seleccionados';
+          } else {
+            hint.textContent = placeholder;
+          }
+        });
+        ['dragenter', 'dragover'].forEach(function (evt) {
+          zone.addEventListener(evt, function () { zone.classList.add('is-dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(function (evt) {
+          zone.addEventListener(evt, function () { zone.classList.remove('is-dragover'); });
+        });
+      });
+    </script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

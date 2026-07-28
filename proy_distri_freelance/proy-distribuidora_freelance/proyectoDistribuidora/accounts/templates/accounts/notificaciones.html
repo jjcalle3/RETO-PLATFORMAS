@@ -1,0 +1,50 @@
+﻿{% extends 'base.html' %}
+{% block title %}Notificaciones{% endblock %}
+{% block content %}
+<h2>Notificaciones</h2>
+{% if notificaciones %}
+<form method="post" action="{% url 'marcar_todas_leidas' %}">
+  {% csrf_token %}
+  <button type="submit" class="btn touch-target">Marcar todas como leídas</button>
+</form>
+{% endif %}
+<div class="table-scroll">
+<table class="datatable">
+  <thead>
+    <tr>
+      <th class="notif-col-message">Mensaje</th>
+      <th>Pedido</th>
+      <th>Fecha</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for n in notificaciones %}
+    <tr{% if not n.is_read %} class="unread"{% endif %}>
+      <td class="notif-col-message">{{ n.message }}</td>
+      <td>{% if n.order %}<a href="{% url 'ver_pedido' n.order.id %}" class="data-mono">#{{ n.order.id }}</a>{% else %}—{% endif %}</td>
+      <td class="data-mono">{{ n.created_at|date:"d/m/Y H:i" }}</td>
+      <td>
+        {% if n.is_read %}
+        <span class="status-pill status-pill--notif-read">Leída</span>
+        {% else %}
+        <span class="status-pill status-pill--notif-unread">No leída</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if not n.is_read %}
+        <form method="post" action="{% url 'marcar_notificacion_leida' n.id %}" style="display:inline">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-secondary btn-sm touch-target">Marcar como leída</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No tienes notificaciones.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

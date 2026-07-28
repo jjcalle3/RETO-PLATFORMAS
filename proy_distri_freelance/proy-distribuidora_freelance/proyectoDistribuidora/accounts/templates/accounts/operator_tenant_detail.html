@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}{{ distribuidor.name }} — Panel de Operador{% endblock %}
+{% block content %}
+<p><a href="{% url 'operator_dashboard' %}">← Volver al panel</a></p>
+<h2>{{ distribuidor.name }}</h2>
+
+<section>
+  <h3>Información del distribuidor</h3>
+  <p><strong>Correo:</strong> {{ distribuidor.email }}</p>
+  <p><strong>Estado:</strong> {{ distribuidor.get_status_display }}</p>
+  <p><strong>Plan:</strong> {{ distribuidor.get_plan_display }}</p>
+</section>
+
+<section>
+  <h3>Acciones</h3>
+  {% if distribuidor.status != TenantStatus.ACTIVE %}
+  <form method="post" action="{% url 'operator_activate_tenant' distribuidor.id %}" style="display:inline">
+    {% csrf_token %}
+    <button type="submit">Activar</button>
+  </form>
+  {% endif %}
+  {% if distribuidor.status != TenantStatus.SUSPENDED %}
+  <form method="post" action="{% url 'operator_suspend_tenant' distribuidor.id %}" style="display:inline">
+    {% csrf_token %}
+    <button type="submit">Suspender</button>
+  </form>
+  {% endif %}
+</section>
+
+<section>
+  <h3>Usuarios ({{ usuarios|length }})</h3>
+  {% if usuarios %}
+  <table class="datatable">
+    <thead>
+      <tr>
+        <th>Correo</th>
+        <th>Rol</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td>{{ u.email }}</td>
+        <td>{{ u.get_role_display }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Este distribuidor no tiene usuarios todavía.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h3>Últimas 20 entradas de auditoría</h3>
+  {% if audit_entries %}
+  <table class="datatable">
+    <thead>
+      <tr>
+        <th>Acción</th>
+        <th>Entidad</th>
+        <th>Usuario</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in audit_entries %}
+      <tr>
+        <td>{{ entry.action }}</td>
+        <td>{{ entry.entity_type }}</td>
+        <td>{{ entry.user.email }}</td>
+        <td>{{ entry.entity_id }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Sin entradas de auditoría para este distribuidor.</p>
+  {% endif %}
+</section>
+{% endblock %}

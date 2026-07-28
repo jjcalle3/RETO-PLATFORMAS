@@ -1,0 +1,105 @@
+﻿{% extends 'base.html' %}
+{% load status_tags %}
+{% block title %}Pedido #{{ pedido.id }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_orders' %}">← Volver a Pedidos</a></p>
+
+<h2>Pedido #{{ pedido.id }} — {{ pedido.status|status_pill:pedido.get_status_display }}</h2>
+
+<p>
+  <strong>Tienda:</strong> {{ pedido.store }}<br>
+  <strong>Vendedor:</strong> {{ pedido.vendor }}<br>
+  <strong>Creado:</strong> {{ pedido.created_at|date:"d/m/Y H:i" }}<br>
+  <strong>Actualizado:</strong> {{ pedido.updated_at|date:"d/m/Y H:i" }}<br>
+  {% if pedido.previous_order %}
+  <strong>Pedido anterior:</strong> #{{ pedido.previous_order.id }}<br>
+  {% endif %}
+  {% if pedido.rejection_reason %}
+  <strong>Motivo de rechazo:</strong> {{ pedido.rejection_reason }}<br>
+  {% endif %}
+  {% if pedido.issue_description %}
+  <strong>Incidencia reportada</strong> ({{ pedido.issue_reported_at|date:"d/m/Y H:i" }}):<br>
+  {{ pedido.issue_description|linebreaksbr }}<br>
+  {% endif %}
+  {% if pedido.resolution_notes %}
+  <strong>Resolución</strong> ({{ pedido.resolved_at|date:"d/m/Y H:i" }}):<br>
+  {{ pedido.resolution_notes|linebreaksbr }}<br>
+  {% endif %}
+</p>
+
+{% include 'partials/order_stepper.html' with status=pedido.status %}
+
+{% if request.user.role == 'VENDOR' and pedido.status == 'PENDING' %}
+<form method="post" action="{% url 'aceptar_pedido' pedido.id %}" style="display:inline"
+      onsubmit="return confirm('¿Aceptar este pedido? Esto descuenta el inventario.')">
+  {% csrf_token %}
+  <button type="submit">Aceptar</button>
+</form>
+<a class="btn" style="margin-top:16px" href="{% url 'rechazar_pedido' pedido.id %}">Rechazar</a>
+{% endif %}
+
+{% if request.user.role == 'VENDOR' and pedido.status == 'ACCEPTED' %}
+<form method="post" action="{% url 'despachar_pedido' pedido.id %}" style="display:inline"
+      onsubmit="return confirm('¿Marcar este pedido como despachado?')">
+  {% csrf_token %}
+  <button type="submit">Marcar como despachado</button>
+</form>
+{% endif %}
+
+{% if request.user.role == 'STORE_OWNER' and pedido.status == 'PENDING' %}
+<form method="post" action="{% url 'cancelar_pedido' pedido.id %}" style="display:inline"
+      onsubmit="return confirm('¿Cancelar este pedido?')">
+  {% csrf_token %}
+  <button type="submit">Cancelar pedido</button>
+</form>
+{% endif %}
+
+{% if request.user.role == 'STORE_OWNER' and pedido.status == 'DELIVERED' %}
+<form method="post" action="{% url 'confirmar_recepcion' pedido.id %}" style="display:inline"
+      onsubmit="return confirm('¿Confirmas que recibiste el pedido correctamente?')">
+  {% csrf_token %}
+  <button type="submit">Confirmar recepción</button>
+</form>
+<a class="btn" style="margin-top:16px" href="{% url 'reportar_incidencia' pedido.id %}">Reportar problema</a>
+{% endif %}
+
+{% if request.user.role == 'VENDOR' and pedido.status == 'DELIVERY_ISSUE' %}
+<a class="btn" style="margin-top:16px" href="{% url 'resolver_incidencia' pedido.id %}">Resolver incidencia</a>
+{% endif %}
+
+<h3>Items del Pedido</h3>
+{% if request.user.role == 'STORE_OWNER' and pedido.status == 'PENDING' %}
+<div class="page-actions">
+  <a class="btn" href="{% url 'crear_item_pedido' pedido.id %}">+ Agregar Item</a>
+</div>
+{% endif %}
+<table class="datatable">
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Cantidad</th>
+      <th>Precio unitario</th>
+      {% if request.user.role == 'STORE_OWNER' and pedido.status == 'PENDING' %}
+      <th>Acciones</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr>
+      <td>{{ item.product }}</td>
+      <td class="data-mono">{{ item.quantity }}</td>
+      <td class="data-mono">${{ item.unit_price_at_time }}</td>
+      {% if request.user.role == 'STORE_OWNER' and pedido.status == 'PENDING' %}
+      <td>
+        <a href="{% url 'editar_item_pedido' item.id %}">Editar</a> |
+        <a href="{% url 'eliminar_item_pedido' item.id %}" onclick="return confirm('¿Eliminar item {{ item.product }}?')">Eliminar</a>
+      </td>
+      {% endif %}
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Sin items.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

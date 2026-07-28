@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Editar Usuario{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_accounts' %}">← Volver</a></p>
+{% url 'index_accounts' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Editar Usuario" submit_label="Actualizar" cancel_url=url_cancel %}
+{% endblock %}

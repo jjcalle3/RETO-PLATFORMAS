@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Rechazar Pedido #{{ pedido.id }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'ver_pedido' pedido.id %}">← Volver al pedido</a></p>
+<p>Tienda: <strong>{{ pedido.store }}</strong></p>
+
+<div class="form-card">
+  <div class="form-card__header">
+    <h3>Rechazar Pedido #{{ pedido.id }}</h3>
+  </div>
+  <form method="post" onsubmit="return confirm('¿Confirmas que quieres rechazar este pedido?')">
+    {% csrf_token %}
+    <div class="form-card__body">
+      <div class="form-grid">
+        <div class="form-field form-field--wide">
+          <label for="rejection_reason">Motivo (opcional)</label>
+          <textarea id="rejection_reason" name="rejection_reason" maxlength="500" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="form-card__footer">
+      <button type="submit">Rechazar pedido</button>
+      <a class="btn btn-secondary" href="{% url 'ver_pedido' pedido.id %}">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

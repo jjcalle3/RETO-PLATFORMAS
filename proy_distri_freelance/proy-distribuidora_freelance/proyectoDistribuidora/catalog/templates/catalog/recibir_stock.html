@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Recibir Stock{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_productos' %}">← Volver a Productos</a></p>
+<p><strong>{{ producto.name }}</strong> — Stock actual: <span class="data-mono">{{ stock.quantity }}</span> {{ producto.unit_of_measure }} · Almacén: {{ stock.warehouse.name }}</p>
+{% url 'index_productos' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Recibir stock" submit_label="Recibir" cancel_url=url_cancel %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Gestionar Descuento{% endblock %}
+{% block content %}
+<p><a href="{% url 'editar_producto' producto.id %}">← Volver al producto</a></p>
+<p><strong>{{ producto.name }}</strong> — Precio regular: <span class="data-mono">${{ producto.unit_price }}</span></p>
+{% url 'editar_producto' producto.id as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Gestionar Descuento" cancel_url=url_cancel %}
+
+<form method="post" action="{% url 'quitar_descuento' producto.id %}" onsubmit="return confirm('¿Quitar el descuento de este producto?')">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-secondary">Quitar descuento</button>
+</form>
+{% endblock %}

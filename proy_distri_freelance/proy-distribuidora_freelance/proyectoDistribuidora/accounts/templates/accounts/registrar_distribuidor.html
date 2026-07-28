@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Registrar mi distribuidora{% endblock %}
+{% block content %}
+<p class="form-hint">Completa tus datos para crear tu distribuidora y tu cuenta de administrador.</p>
+{% include 'partials/form_card.html' with formulario=formulario title="Registrar mi distribuidora" submit_label="Crear mi distribuidora" %}
+{% endblock %}

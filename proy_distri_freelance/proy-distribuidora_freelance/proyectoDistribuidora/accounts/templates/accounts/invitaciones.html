@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Invitaciones a distribuidoras{% endblock %}
+{% block content %}
+<p><a href="{% url 'home' %}">← Volver</a></p>
+<h2>Invitaciones a distribuidoras</h2>
+<div class="page-actions">
+  <a class="btn" href="{% url 'emitir_invitacion' %}">+ Emitir una nueva invitación</a>
+</div>
+
+{% if invitaciones %}
+<table class="datatable">
+  <thead>
+    <tr>
+      <th>Correo</th>
+      <th>Emitida por</th>
+      <th>Creada</th>
+      <th>Expira</th>
+      <th>Estado</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for invitacion in invitaciones %}
+    <tr>
+      <td>{{ invitacion.target_email|default:"(solo enlace)" }}</td>
+      <td>{{ invitacion.created_by.email|default:"—" }}</td>
+      <td>{{ invitacion.created_at }}</td>
+      <td>{{ invitacion.expires_at }}</td>
+      <td>
+        {% if invitacion.revoked_at %}
+          Revocada
+        {% elif invitacion.used_at %}
+          Usada
+        {% elif invitacion.is_expired %}
+          Expirada
+        {% else %}
+          Pendiente
+        {% endif %}
+      </td>
+      <td>
+        {% if not invitacion.revoked_at and not invitacion.used_at and not invitacion.is_expired %}
+        <form method="post" action="{% url 'revocar_invitacion' invitacion.id %}">
+          {% csrf_token %}
+          <button type="submit" class="linklike">Revocar</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No hay invitaciones pendientes.</p>
+{% endif %}
+{% endblock %}

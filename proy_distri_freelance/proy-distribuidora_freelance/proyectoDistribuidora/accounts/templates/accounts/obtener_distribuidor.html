@@ -1,0 +1,30 @@
+﻿{% extends 'base.html' %}
+{% block title %}Distribuidor — {{ distribuidor.name }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'home' %}">← Volver</a></p>
+
+<h2>{{ distribuidor.name }}</h2>
+<p>{{ distribuidor.email }}</p>
+<p><a href="{% url 'editar_distribuidor' distribuidor.id %}">Editar</a></p>
+
+<h3>Usuarios de este distribuidor</h3>
+<p>Gestión de usuarios individuales — usa /admin/ (el distribuidor mismo la hace desde su propio panel en "Usuarios").</p>
+<table class="datatable">
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Rol</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in usuarios %}
+    <tr>
+      <td>{{ u.email }}</td>
+      <td>{{ u.role }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">Sin usuarios para este distribuidor.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

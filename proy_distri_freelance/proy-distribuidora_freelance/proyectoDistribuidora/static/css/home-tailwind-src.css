@@ -1,0 +1,112 @@
+/*
+  ISBEN Solutions — homepage-only Tailwind build (Tailwind CSS v4, standalone CLI).
+
+  This file is the SOURCE only — never link it directly. It compiles to
+  static/css/home-tailwind.css, which is the file templates/base.html's
+  {% block extra_head %} links, and only templates/home.html fills that
+  block. This keeps Tailwind's base-style reset off every other template
+  (dashboards/forms/tables) in the app, which still rely on styles.css only.
+
+  Rebuild after editing this file or the Tailwind classes in templates/home.html:
+    cd proyectoDistribuidora
+    .\static\tailwindcli\tailwindcss.exe -i .\static\css\home-tailwind-src.css -o .\static\css\home-tailwind.css --minify
+
+  (tailwindcss.exe is the standalone CLI binary, downloaded from
+  https://github.com/tailwindlabs/tailwindcss/releases/latest — not committed,
+  see .gitignore.)
+*/
+
+@import "tailwindcss" source(none);
+@source "../../templates/home.html";
+
+@theme {
+  --color-ink: #231a16;
+  --color-cream: #fff8f0;
+  --color-canvas: #ffffff;
+  --color-orange: #fb4318;
+  --color-gold: #ffc22f;
+  --color-slate: #6b5d55;
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Public Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.85rem 1.75rem;
+    min-height: 44px;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      background-color 0.15s ease;
+    text-decoration: none;
+  }
+
+  .btn-pill-primary {
+    /* Ink text on orange, not white: white-on-#FB4318 only reaches ~3.55:1,
+       which fails WCAG AA for normal-size text. Ink-on-orange reaches ~4.8:1. */
+    background: var(--color-orange);
+    color: var(--color-ink);
+    box-shadow: 0 0 0 0 var(--color-gold);
+  }
+
+  .btn-pill-primary:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 0 0 var(--color-gold);
+  }
+
+  .btn-pill-primary:active {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 0 0 var(--color-gold);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-pill-primary:hover,
+    .btn-pill-primary:active {
+      transform: none;
+    }
+  }
+
+  details > summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Signature motif: the isotype's own trailing-spots detail (iso_1.png),
+     echoed once, confidently, as a real decorative texture — sized and
+     positioned per usage via utility classes on the element, not hidden
+     behind opaque siblings. */
+  .spot-trail span {
+    position: absolute;
+    border-radius: 9999px;
+  }
+}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Historial de Stock{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_productos' %}">← Volver a Productos</a></p>
+<h2>Historial de Stock — {{ producto.name }}</h2>
+
+<div style="margin-bottom: 20px;">
+  <p><strong>Producto:</strong> {{ producto.name }} ({{ producto.sku }})</p>
+  <p><strong>Almacén:</strong> Predeterminado</p>
+</div>
+
+{% if movimientos %}
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+        <th style="padding: 10px; text-align: left;">Fecha</th>
+        <th style="padding: 10px; text-align: left;">Acción</th>
+        <th style="padding: 10px; text-align: center;">Movimiento</th>
+        <th style="padding: 10px; text-align: center;">Balance</th>
+        <th style="padding: 10px; text-align: left;">Usuario</th>
+        <th style="padding: 10px; text-align: left;">Nota</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for movimiento in movimientos %}
+        <tr style="border-bottom: 1px solid #eee;">
+          <td style="padding: 10px;">{{ movimiento.created_at|date:"d/m/Y H:i" }}</td>
+          <td style="padding: 10px;">{{ movimiento.get_reason_display }}</td>
+          <td style="padding: 10px; text-align: center; {% if movimiento.delta > 0 %}color: green;{% elif movimiento.delta < 0 %}color: red;{% endif %}">
+            {% if movimiento.delta > 0 %}+{% endif %}{{ movimiento.delta }}
+          </td>
+          <td style="padding: 10px; text-align: center; font-weight: bold;">{{ movimiento.balance_after }}</td>
+          <td style="padding: 10px;">{{ movimiento.actor.email|default:"—" }}</td>
+          <td style="padding: 10px; font-size: 0.9em; color: #666;">
+            {{ movimiento.details.note|default:"" }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p style="color: #999;">No hay movimientos registrados para este producto.</p>
+{% endif %}
+
+<div style="margin-top: 20px;">
+  <a href="{% url 'recibir_stock' producto.id %}">+ Recibir</a> |
+  <a href="{% url 'contar_stock' producto.id %}">= Contar</a> |
+  <a href="{% url 'ajustar_stock' producto.id %}">± Ajustar</a> |
+  <a href="{% url 'index_productos' %}">Volver</a>
+</div>
+{% endblock %}

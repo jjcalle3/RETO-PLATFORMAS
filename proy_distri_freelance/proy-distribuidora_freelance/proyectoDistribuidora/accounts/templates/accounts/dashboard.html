@@ -1,0 +1,489 @@
+﻿{% extends 'base.html' %}
+{% load status_tags %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2>Dashboard — {{ distribuidor.name }}</h2>
+
+{% if stock_bajo_count %}
+<p class="error">⚠ {{ stock_bajo_count }} producto(s) con stock bajo — <a href="{% url 'inventario' %}">gestionar inventario</a>.</p>
+{% endif %}
+
+<h3>Filtros</h3>
+<div class="filter-bar">
+  <form method="get" class="filter-bar__form">
+    <div class="filter-field">
+      <label id="date_from-label">Desde</label>
+      <div class="date-picker" data-date-picker>
+        <input type="hidden" name="date_from" value="{{ filtros.date_from }}">
+        <button type="button" class="date-picker__toggle" aria-haspopup="true" aria-expanded="false" aria-labelledby="date_from-label">
+          <span class="date-picker__toggle-label">dd/mm/aaaa</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3v2.5M14 3v2.5M3 8h14M4 6h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/></svg>
+        </button>
+        <div class="date-picker__panel" hidden>
+          <div class="date-picker__header">
+            <button type="button" class="date-picker__nav" data-nav="prev" aria-label="Mes anterior">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12 4l-6 6 6 6"/></svg>
+            </button>
+            <div class="date-picker__month-label"></div>
+            <button type="button" class="date-picker__nav" data-nav="next" aria-label="Mes siguiente">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 4l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <div class="date-picker__weekdays">
+            <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span>
+          </div>
+          <div class="date-picker__days"></div>
+          <div class="date-picker__footer">
+            <button type="button" class="date-picker__today-btn">Hoy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="filter-field">
+      <label id="date_to-label">Hasta</label>
+      <div class="date-picker" data-date-picker>
+        <input type="hidden" name="date_to" value="{{ filtros.date_to }}">
+        <button type="button" class="date-picker__toggle" aria-haspopup="true" aria-expanded="false" aria-labelledby="date_to-label">
+          <span class="date-picker__toggle-label">dd/mm/aaaa</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3v2.5M14 3v2.5M3 8h14M4 6h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z"/></svg>
+        </button>
+        <div class="date-picker__panel" hidden>
+          <div class="date-picker__header">
+            <button type="button" class="date-picker__nav" data-nav="prev" aria-label="Mes anterior">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12 4l-6 6 6 6"/></svg>
+            </button>
+            <div class="date-picker__month-label"></div>
+            <button type="button" class="date-picker__nav" data-nav="next" aria-label="Mes siguiente">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 4l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <div class="date-picker__weekdays">
+            <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sa</span>
+          </div>
+          <div class="date-picker__days"></div>
+          <div class="date-picker__footer">
+            <button type="button" class="date-picker__today-btn">Hoy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-field">
+      <label id="vendor-label">Vendedor</label>
+      <div class="filter-dropdown" data-filter-dropdown data-default-label="Todos">
+        <button type="button" class="filter-dropdown__toggle" aria-haspopup="true" aria-expanded="false" aria-labelledby="vendor-label">
+          <span class="filter-dropdown__toggle-label">Todos</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="filter-dropdown__panel" hidden>
+          <input type="text" class="filter-dropdown__search" placeholder="Buscar vendedor…">
+          <div class="filter-dropdown__options">
+            {% for v in vendedores %}
+            <label class="filter-dropdown__option">
+              <input type="checkbox" name="vendor" value="{{ v.id }}" {% if v.id|stringformat:"s" in filtros.vendor %}checked{% endif %}>
+              <span>{{ v.email }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-field">
+      <label id="store-label">Tienda</label>
+      <div class="filter-dropdown" data-filter-dropdown data-default-label="Todas">
+        <button type="button" class="filter-dropdown__toggle" aria-haspopup="true" aria-expanded="false" aria-labelledby="store-label">
+          <span class="filter-dropdown__toggle-label">Todas</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="filter-dropdown__panel" hidden>
+          <input type="text" class="filter-dropdown__search" placeholder="Buscar tienda…">
+          <div class="filter-dropdown__options">
+            {% for t in tiendas %}
+            <label class="filter-dropdown__option">
+              <input type="checkbox" name="store" value="{{ t.id }}" {% if t.id|stringformat:"s" in filtros.store %}checked{% endif %}>
+              <span>{{ t.name }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-field">
+      <label id="status-label">Estado</label>
+      <div class="filter-dropdown" data-filter-dropdown data-default-label="Todos">
+        <button type="button" class="filter-dropdown__toggle" aria-haspopup="true" aria-expanded="false" aria-labelledby="status-label">
+          <span class="filter-dropdown__toggle-label">Todos</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5"/></svg>
+        </button>
+        <div class="filter-dropdown__panel" hidden>
+          <div class="filter-dropdown__options">
+            {% for value, label in status_choices %}
+            <label class="filter-dropdown__option">
+              <input type="checkbox" name="status" value="{{ value }}" {% if value in filtros.status %}checked{% endif %}>
+              <span>{{ label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-field filter-field--actions">
+      <button type="submit" class="btn">Filtrar</button>
+      <a href="{% url 'distributor_dashboard' %}" class="btn btn-secondary">Limpiar filtros</a>
+    </div>
+  </form>
+  <div class="filter-chips" id="filter-chips"></div>
+</div>
+
+<h3>Resumen</h3>
+<div class="stat-cards">
+  <div class="stat-card">
+    <div class="stat-card__icon stat-card__icon--primary">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="7" cy="17" r="1.4"/><circle cx="15" cy="17" r="1.4"/><path d="M2 3h2l2 11h10l2-8H6"/></svg>
+    </div>
+    <div>
+      <div class="stat-card__label">Total de pedidos</div>
+      <div class="stat-card__value data-mono">{{ metricas.total }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__icon stat-card__icon--success">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M7 10l2 2 4-4"/></svg>
+    </div>
+    <div>
+      <div class="stat-card__label">Cumplidos (confirmados)</div>
+      <div class="stat-card__value data-mono">{{ metricas.fulfilled }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__icon stat-card__icon--error">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M7.5 7.5l5 5M12.5 7.5l-5 5"/></svg>
+    </div>
+    <div>
+      <div class="stat-card__label">Rechazados</div>
+      <div class="stat-card__value data-mono">{{ metricas.rejected }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__icon stat-card__icon--gold">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>
+    </div>
+    <div>
+      <div class="stat-card__label">Tiempo promedio de cumplimiento</div>
+      <div class="stat-card__value data-mono">{% if metricas.tiempo_promedio %}{{ metricas.tiempo_promedio }}{% else %}—{% endif %}</div>
+    </div>
+  </div>
+</div>
+
+<h3>Pedidos por estado</h3>
+<div class="stat-cards stat-cards--compact">
+  {% for fila in ordenes_por_estado %}
+  <div class="stat-card">
+    <div>
+      {{ fila.status|status_pill:fila.status_label }}
+      <div class="stat-card__value data-mono">{{ fila.total }}</div>
+    </div>
+  </div>
+  {% empty %}
+  <p>No hay pedidos con estos filtros.</p>
+  {% endfor %}
+</div>
+
+<h3>Pedidos ({{ pedidos_recientes|length }} de {{ metricas.total }})</h3>
+<table class="datatable" data-order='[[5,"asc"],[6,"asc"]]'>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Tienda</th>
+      <th>Vendedor</th>
+      <th>Estado</th>
+      <th>Creado</th>
+      <th class="dt-hidden">Prioridad</th>
+      <th class="dt-hidden">Creado (orden)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in pedidos_recientes %}
+    <tr>
+      <td class="data-mono"><a href="{% url 'ver_pedido' p.id %}">{{ p.id }}</a></td>
+      <td>{{ p.store }}</td>
+      <td>{{ p.vendor }}</td>
+      <td>{{ p.status|status_pill:p.get_status_display }}</td>
+      <td>{{ p.created_at|date:"d/m/Y H:i" }}</td>
+      <td>{{ p.status|status_priority }}</td>
+      <td>{{ p.created_at|date:"c" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">No hay pedidos con estos filtros.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>Inventario por almacén</h3>
+<table class="datatable">
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Almacén</th>
+      <th>Cantidad</th>
+      <th>Umbral de stock bajo</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for inv in inventario %}
+    <tr{% if inv.quantity < inv.product.low_stock_threshold %} class="error"{% endif %}>
+      <td>{{ inv.product.name }}</td>
+      <td>{{ inv.warehouse.name }}</td>
+      <td>
+        <span class="data-mono">{{ inv.quantity }}</span>
+        {% if inv.quantity < inv.product.low_stock_threshold %} — ⚠ Stock bajo{% endif %}
+      </td>
+      <td class="data-mono">{{ inv.product.low_stock_threshold }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Sin stock registrado todavía.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Filter popovers: multi-select dropdowns (Vendedor/Tienda/Estado) and the
+// custom date pickers (Desde/Hasta). Plain vanilla JS — no Alpine/framework
+// — this is the only place in the app needing widgets like this, and both
+// still work with zero JS (native checkboxes; a plain hidden date input).
+(function () {
+  function closeAllPopovers() {
+    document.querySelectorAll('.filter-dropdown.is-open, .date-picker.is-open').forEach(function (el) {
+      el.classList.remove('is-open', 'is-flipped');
+      var panel = el.querySelector('.filter-dropdown__panel, .date-picker__panel');
+      if (panel) panel.hidden = true;
+      var toggle = el.querySelector('.filter-dropdown__toggle, .date-picker__toggle');
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function openPopover(root, panel, toggle, focusEl) {
+    closeAllPopovers();
+    root.classList.add('is-open');
+    panel.hidden = false;
+    toggle.setAttribute('aria-expanded', 'true');
+    // Flip to the right-aligned edge if opening would overflow the viewport
+    // (e.g. the rightmost filter in the row) — see ISSUE report about the
+    // Estado dropdown getting clipped off the right edge.
+    var rect = panel.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 8) {
+      root.classList.add('is-flipped');
+    }
+    if (focusEl) focusEl.focus();
+  }
+
+  document.addEventListener('click', closeAllPopovers);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeAllPopovers();
+  });
+
+  // --- Multi-select dropdowns (Vendedor/Tienda/Estado) ---
+
+  function updateToggleLabel(dropdown) {
+    var checked = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+    var label = dropdown.querySelector('.filter-dropdown__toggle-label');
+    if (checked.length === 0) {
+      label.textContent = dropdown.dataset.defaultLabel;
+    } else if (checked.length === 1) {
+      label.textContent = checked[0].nextElementSibling.textContent.trim();
+    } else {
+      label.textContent = checked.length + ' seleccionados';
+    }
+  }
+
+  function renderChips() {
+    var container = document.getElementById('filter-chips');
+    if (!container) return;
+    container.innerHTML = '';
+    document.querySelectorAll('.filter-dropdown input[type="checkbox"]:checked').forEach(function (input) {
+      var chip = document.createElement('span');
+      chip.className = 'filter-chip';
+
+      var text = document.createElement('span');
+      text.textContent = input.nextElementSibling.textContent.trim();
+      chip.appendChild(text);
+
+      var removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.setAttribute('aria-label', 'Quitar filtro: ' + text.textContent);
+      removeBtn.textContent = '✕';
+      removeBtn.addEventListener('click', function () {
+        input.checked = false;
+        updateToggleLabel(input.closest('.filter-dropdown'));
+        renderChips();
+      });
+      chip.appendChild(removeBtn);
+
+      container.appendChild(chip);
+    });
+  }
+
+  document.querySelectorAll('[data-filter-dropdown]').forEach(function (dropdown) {
+    var toggle = dropdown.querySelector('.filter-dropdown__toggle');
+    var panel = dropdown.querySelector('.filter-dropdown__panel');
+    var search = dropdown.querySelector('.filter-dropdown__search');
+    var options = dropdown.querySelectorAll('.filter-dropdown__option');
+
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (dropdown.classList.contains('is-open')) {
+        closeAllPopovers();
+      } else {
+        openPopover(dropdown, panel, toggle, search);
+      }
+    });
+
+    panel.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+
+    if (search) {
+      search.addEventListener('input', function () {
+        var q = search.value.trim().toLowerCase();
+        options.forEach(function (opt) {
+          opt.style.display = opt.textContent.trim().toLowerCase().includes(q) ? '' : 'none';
+        });
+      });
+    }
+
+    dropdown.querySelectorAll('input[type="checkbox"]').forEach(function (input) {
+      input.addEventListener('change', function () {
+        updateToggleLabel(dropdown);
+        renderChips();
+      });
+    });
+
+    updateToggleLabel(dropdown);
+  });
+
+  renderChips();
+
+  // --- Custom date pickers (Desde/Hasta) ---
+
+  var MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+  function pad2(n) { return String(n).padStart(2, '0'); }
+
+  function parseISO(s) {
+    if (!s) return null;
+    var parts = s.split('-');
+    if (parts.length !== 3) return null;
+    var d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function toISO(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function toDisplay(d) { return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear(); }
+
+  function sameDay(a, b) {
+    return !!a && !!b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  document.querySelectorAll('[data-date-picker]').forEach(function (root) {
+    var hidden = root.querySelector('input[type="hidden"]');
+    var toggle = root.querySelector('.date-picker__toggle');
+    var label = root.querySelector('.date-picker__toggle-label');
+    var panel = root.querySelector('.date-picker__panel');
+    var monthLabel = root.querySelector('.date-picker__month-label');
+    var daysContainer = root.querySelector('.date-picker__days');
+    var prevBtn = root.querySelector('[data-nav="prev"]');
+    var nextBtn = root.querySelector('[data-nav="next"]');
+    var todayBtn = root.querySelector('.date-picker__today-btn');
+
+    var selected = parseISO(hidden.value);
+    var viewDate = selected
+      ? new Date(selected.getFullYear(), selected.getMonth(), 1)
+      : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+    function updateLabel() {
+      if (selected) {
+        label.textContent = toDisplay(selected);
+        label.classList.remove('is-placeholder');
+      } else {
+        label.textContent = 'dd/mm/aaaa';
+        label.classList.add('is-placeholder');
+      }
+    }
+
+    function render() {
+      monthLabel.textContent = MONTH_NAMES[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
+      daysContainer.innerHTML = '';
+      var startingDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
+      var daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+      var today = new Date();
+
+      for (var i = 0; i < startingDay; i++) {
+        var empty = document.createElement('span');
+        empty.className = 'date-picker__day date-picker__day--empty';
+        daysContainer.appendChild(empty);
+      }
+
+      for (var d = 1; d <= daysInMonth; d++) {
+        var thisDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), d);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'date-picker__day';
+        if (sameDay(thisDate, today)) btn.classList.add('date-picker__day--today');
+        if (sameDay(thisDate, selected)) btn.classList.add('date-picker__day--selected');
+        btn.textContent = d;
+        btn.addEventListener('click', (function (dateForBtn) {
+          return function () {
+            selected = dateForBtn;
+            hidden.value = toISO(selected);
+            updateLabel();
+            render();
+            closeAllPopovers();
+          };
+        })(thisDate));
+        daysContainer.appendChild(btn);
+      }
+    }
+
+    prevBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      viewDate.setMonth(viewDate.getMonth() - 1);
+      render();
+    });
+    nextBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      viewDate.setMonth(viewDate.getMonth() + 1);
+      render();
+    });
+    todayBtn.addEventListener('click', function () {
+      var today = new Date();
+      selected = today;
+      viewDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      hidden.value = toISO(selected);
+      updateLabel();
+      render();
+      closeAllPopovers();
+    });
+
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (root.classList.contains('is-open')) {
+        closeAllPopovers();
+      } else {
+        openPopover(root, panel, toggle, null);
+      }
+    });
+    panel.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+
+    updateLabel();
+    render();
+  });
+})();
+</script>
+{% endblock %}

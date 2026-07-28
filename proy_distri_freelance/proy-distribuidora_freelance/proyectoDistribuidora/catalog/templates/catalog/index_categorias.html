@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Categorías{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_catalog' %}">← Catálogo</a></p>
+<h2>Categorías</h2>
+<div class="page-actions">
+  <a class="btn" href="{% url 'crear_categoria' %}">+ Nueva Categoría</a>
+</div>
+<table class="datatable">
+  <thead><tr><th>Nombre</th><th>Acciones</th></tr></thead>
+  <tbody>
+    {% for c in categorias %}
+    <tr>
+      <td>{{ c.name }}</td>
+      <td><a href="{% url 'editar_categoria' c.id %}">Editar</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">No hay categorías.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

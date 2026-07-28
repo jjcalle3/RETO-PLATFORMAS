@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Crear Pedido{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_orders' %}">← Volver a Pedidos</a></p>
+<h2>Crear Pedido</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ formulario.as_p }}
+  <p>
+    <input type="submit" value="Guardar">
+    <a href="{% url 'index_orders' %}">Cancelar</a>
+  </p>
+</form>
+{% endblock %}

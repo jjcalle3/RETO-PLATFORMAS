@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Reportar Incidencia — Pedido #{{ pedido.id }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'ver_pedido' pedido.id %}">← Volver al pedido</a></p>
+<p>Tienda: <strong>{{ pedido.store }}</strong></p>
+{% url 'ver_pedido' pedido.id as url_cancel %}
+{% with pid=pedido.id|stringformat:"s" %}
+{% include 'partials/form_card.html' with formulario=formulario title="Reportar Incidencia — Pedido #"|add:pid submit_label="Reportar problema" cancel_url=url_cancel confirm="¿Confirmas que quieres reportar un problema con este pedido?" %}
+{% endwith %}
+{% endblock %}

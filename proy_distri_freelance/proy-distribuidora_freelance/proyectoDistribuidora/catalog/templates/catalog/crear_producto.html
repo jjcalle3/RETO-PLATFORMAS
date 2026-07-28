@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Nuevo Producto{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_productos' %}">← Volver a Productos</a></p>
+
+<div class="form-card">
+  <div class="form-card__header">
+    <h3>Nuevo Producto</h3>
+  </div>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-card__body">
+      {{ formulario.non_field_errors }}
+
+      <h4 class="form-section-title">Identidad</h4>
+      <div class="form-grid">
+        <div class="form-field">{{ formulario.name.label_tag }}{{ formulario.name }}{{ formulario.name.errors }}</div>
+        <div class="form-field">{{ formulario.sku.label_tag }}{{ formulario.sku }}{{ formulario.sku.errors }}</div>
+        <div class="form-field">{{ formulario.barcode.label_tag }}{{ formulario.barcode }}{{ formulario.barcode.errors }}</div>
+      </div>
+
+      <h4 class="form-section-title">Clasificación</h4>
+      <div class="form-grid">
+        <div class="form-field">
+          {{ formulario.category.label_tag }}
+          <div class="form-field__inline">
+            {{ formulario.category }}
+            <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPopup('{% url 'crear_categoria' %}?popup=1', 'refreshCategorySelect')">+</button>
+          </div>
+          {{ formulario.category.errors }}
+        </div>
+        <div class="form-field">
+          {{ formulario.brand.label_tag }}
+          <div class="form-field__inline">
+            {{ formulario.brand }}
+            <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPopup('{% url 'crear_marca' %}?popup=1', 'refreshBrandSelect')">+</button>
+          </div>
+          {{ formulario.brand.errors }}
+        </div>
+        <div class="form-field">{{ formulario.unit_of_measure.label_tag }}{{ formulario.unit_of_measure }}{{ formulario.unit_of_measure.errors }}</div>
+      </div>
+
+      <h4 class="form-section-title">Precio y estado</h4>
+      <div class="form-grid">
+        <div class="form-field">{{ formulario.unit_price.label_tag }}{{ formulario.unit_price }}{{ formulario.unit_price.errors }}</div>
+        <div class="form-field">{{ formulario.status.label_tag }}{{ formulario.status }}{{ formulario.status.errors }}</div>
+        <div class="form-field">{{ formulario.low_stock_threshold.label_tag }}{{ formulario.low_stock_threshold }}{{ formulario.low_stock_threshold.errors }}</div>
+        <div class="form-field form-field--wide">{{ formulario.description.label_tag }}{{ formulario.description }}{{ formulario.description.errors }}</div>
+      </div>
+
+      <h4 class="form-section-title">Imágenes</h4>
+      <div class="form-grid">
+        <div class="form-field">
+          {{ formulario.main_image.label_tag }}
+          <label class="file-dropzone">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z"/></svg>
+            <span class="file-dropzone__title"><span>Sube una imagen</span> o arrástrala aquí</span>
+            <span class="file-dropzone__hint" data-placeholder="PNG o JPG">PNG o JPG</span>
+            {{ formulario.main_image }}
+          </label>
+          {{ formulario.main_image.errors }}
+        </div>
+        <div class="form-field">
+          {{ formulario.additional_images.label_tag }}
+          <label class="file-dropzone">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z"/></svg>
+            <span class="file-dropzone__title"><span>Sube imágenes</span> o arrástralas aquí</span>
+            <span class="file-dropzone__hint" data-placeholder="Puedes seleccionar varias">Puedes seleccionar varias</span>
+            {{ formulario.additional_images }}
+          </label>
+          {{ formulario.additional_images.errors }}
+        </div>
+      </div>
+    </div>
+    <div class="form-card__footer">
+      <button type="submit">Guardar producto</button>
+      <a class="btn btn-secondary" href="{% url 'index_productos' %}">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<script>
+function abrirPopup(url, callback) {
+  window.open(url, callback, 'width=420,height=240,resizable=yes');
+}
+function refreshCategorySelect(id, name) {
+  var sel = document.getElementById('id_category');
+  sel.add(new Option(name, id, true, true));
+}
+function refreshBrandSelect(id, name) {
+  var sel = document.getElementById('id_brand');
+  sel.add(new Option(name, id, true, true));
+}
+</script>
+{% endblock %}

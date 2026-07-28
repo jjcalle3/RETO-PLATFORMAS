@@ -1,0 +1,112 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iniciar sesión — ISBEN Solutions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  </head>
+  <body class="auth-page">
+    <main class="auth-card">
+      <!-- Branding panel (hidden on small screens) -->
+      <aside class="auth-hero">
+        <div class="auth-hero__glow" aria-hidden="true"></div>
+        <div class="auth-hero__glow auth-hero__glow--2" aria-hidden="true"></div>
+        <a href="{% url 'home' %}" class="auth-hero__brand">
+          <img src="{% static 'media/iso_1.png' %}" alt="" width="34" height="34">
+          <span>ISBEN <em>Solutions</em></span>
+        </a>
+        <div class="auth-hero__pitch">
+          <h1>Tu operación,<br>bajo control.</h1>
+          <p>Pedidos, inventario y entregas en una sola plataforma para tu distribuidora.</p>
+        </div>
+        <ul class="auth-hero__points">
+          <li>Inventario con historial auditable</li>
+          <li>Pedidos y estados en tiempo real</li>
+          <li>Entregas confirmadas desde el campo</li>
+        </ul>
+      </aside>
+
+      <!-- Login form -->
+      <section class="auth-panel">
+        <a href="{% url 'home' %}" class="auth-panel__brand">
+          <img src="{% static 'media/iso_1.png' %}" alt="" width="28" height="28">
+          <span>ISBEN <em>Solutions</em></span>
+        </a>
+
+        <div class="auth-panel__head">
+          <h2>Inicia sesión</h2>
+          <p>Ingresa tus credenciales para acceder a tu panel.</p>
+        </div>
+
+        {% if messages %}
+          {% for message in messages %}
+            <p class="auth-note">{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+        {% if form.errors %}
+          <p class="auth-error">Correo o contraseña incorrectos. Intenta de nuevo.</p>
+        {% endif %}
+
+        <form method="post" class="auth-form">
+          {% csrf_token %}
+
+          <div class="auth-field">
+            <label for="{{ form.username.id_for_label }}">Correo electrónico</label>
+            <div class="auth-input">
+              <svg class="auth-input__icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="5" width="14" height="10" rx="1.5"/><path d="M3.5 6l6.5 5 6.5-5"/></svg>
+              {{ form.username }}
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <div class="auth-field__labelrow">
+              <label for="{{ form.password.id_for_label }}">Contraseña</label>
+              <a href="{% url 'solicitar_reset_password' %}">¿Olvidaste?</a>
+            </div>
+            <div class="auth-input">
+              <svg class="auth-input__icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="8" rx="1.5"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9"/></svg>
+              {{ form.password }}
+              <button type="button" class="auth-eye" id="togglePass" aria-label="Mostrar contraseña">
+                <svg id="eyeOpen" viewBox="0 0 20 20" aria-hidden="true"><path d="M1.5 10S4.5 4.5 10 4.5 18.5 10 18.5 10 15.5 15.5 10 15.5 1.5 10 1.5 10z"/><circle cx="10" cy="10" r="2.5"/></svg>
+                <svg id="eyeClosed" viewBox="0 0 20 20" aria-hidden="true" hidden><path d="M3 3l14 14"/><path d="M8.2 8.2a2.5 2.5 0 0 0 3.6 3.6"/><path d="M6.9 5.6C7.9 5.2 8.9 5 10 5c5.5 0 8.5 5 8.5 5a13 13 0 0 1-2.2 2.7M4.2 7.3A13 13 0 0 0 1.5 10s3 5 8.5 5c1 0 2-.2 2.9-.5"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <label class="auth-remember">
+            {{ form.remember_me }}
+            <span>Recordarme</span>
+          </label>
+
+          <input type="hidden" name="next" value="{{ next }}">
+          <button type="submit" class="auth-submit">
+            Ingresar
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg>
+          </button>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        var pass = document.getElementById('{{ form.password.id_for_label }}');
+        var btn = document.getElementById('togglePass');
+        var open = document.getElementById('eyeOpen');
+        var closed = document.getElementById('eyeClosed');
+        if (!pass || !btn) return;
+        btn.addEventListener('click', function () {
+          var show = pass.type === 'password';
+          pass.type = show ? 'text' : 'password';
+          open.hidden = show;
+          closed.hidden = !show;
+          btn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        });
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Configuración{% endblock %}
+{% block content %}
+<h2>Configuración</h2>
+<p class="form-hint">Gestiona tu cuenta, seguridad y notificaciones.</p>
+
+<p class="form-hint" style="margin-top:-12px;">Tu correo de acceso es <strong>{{ user.email }}</strong> (no editable aquí).</p>
+
+{# --- Seguridad: cambiar contraseña (todos) --- #}
+{% include 'partials/form_card.html' with formulario=password_form title="Seguridad — cambiar contraseña" submit_label="Actualizar contraseña" hidden_section="password" %}
+
+{# --- Notificaciones (todos) --- #}
+{% include 'partials/form_card.html' with formulario=notif_form title="Notificaciones" submit_label="Guardar preferencias" hidden_section="notificaciones" %}
+
+{# --- Alertas de pedidos nuevos (VENDOR) --- #}
+{% if vendor_form %}
+{% include 'partials/form_card.html' with formulario=vendor_form title="Alertas de pedidos nuevos" submit_label="Guardar alertas" hidden_section="alertas" %}
+{% endif %}
+
+{# --- Negocio (DISTRIBUTOR): datos + enlace de invitación --- #}
+{% if distributor_form %}
+{% include 'partials/form_card.html' with formulario=distributor_form title="Negocio — datos de la distribuidora" submit_label="Guardar" hidden_section="negocio" %}
+<div class="form-card">
+  <div class="form-card__header"><h3>Enlace de invitación para tiendas</h3></div>
+  <div class="form-card__body">
+    <p class="form-hint">Comparte este enlace para que un dueño de tienda se registre en tu distribuidora.</p>
+    <p><a href="{% url 'registrar_tienda' invite_token %}">{% url 'registrar_tienda' invite_token %}</a></p>
+  </div>
+  <div class="form-card__footer">
+    <form method="post" action="{% url 'regenerar_invite_token' %}"
+          onsubmit="return confirm('¿Generar un enlace nuevo? El enlace anterior dejará de funcionar.')">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-secondary">Regenerar enlace</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+{# --- Mi tienda (STORE_OWNER): edición con mapa en su propia página --- #}
+{% if user.role == 'STORE_OWNER' %}
+<div class="form-card">
+  <div class="form-card__header"><h3>Mi tienda</h3></div>
+  <div class="form-card__body">
+    {% if tienda %}
+      <p class="form-hint">Edita el nombre, dirección, teléfono y ubicación de <strong>{{ tienda.name }}</strong>.</p>
+      <a class="btn" href="{% url 'config_mi_tienda' %}">Editar mi tienda</a>
+    {% else %}
+      <p class="form-hint">Aún no tienes una tienda registrada.</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{# --- Plataforma (SUPER_ADMIN) --- #}
+{% if user.is_superuser or user.role == 'SUPER_ADMIN' %}
+<div class="form-card">
+  <div class="form-card__header"><h3>Plataforma</h3></div>
+  <div class="form-card__body">
+    <p class="form-hint">Administración de distribuidoras e invitaciones.</p>
+    <a class="btn" href="{% url 'operator_dashboard' %}">Ir al panel de operador</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

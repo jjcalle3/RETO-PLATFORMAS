@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Editar Stock{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_catalog' %}">← Volver al Catálogo</a></p>
+<h2>Editar Stock — {{ producto.name }}</h2>
+<p>Almacén: {{ stock.warehouse.name }}</p>
+{% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+<form method="post">
+  {% csrf_token %}
+  <p>
+    <label for="quantity">Cantidad</label>
+    <input type="number" name="quantity" id="quantity" min="0" value="{{ stock.quantity }}" required>
+  </p>
+  <p>
+    <input type="submit" value="Guardar">
+    <a href="{% url 'index_catalog' %}">Cancelar</a>
+  </p>
+</form>
+{% endblock %}

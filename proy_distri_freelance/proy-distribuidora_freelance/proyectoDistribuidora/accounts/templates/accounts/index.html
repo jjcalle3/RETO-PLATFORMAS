@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% load role_tags %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<h2>Usuarios — {{ distribuidor.name }}</h2>
+
+<div class="stat-cards stat-cards--compact">
+  <div class="stat-card">
+    <div>
+      <div class="stat-card__label">Total de usuarios</div>
+      <div class="stat-card__value data-mono">{{ total_usuarios }}</div>
+    </div>
+  </div>
+  {% for fila in conteo_por_rol %}
+  <div class="stat-card">
+    <div>
+      {{ fila.role|role_pill:fila.label }}
+      <div class="stat-card__value data-mono">{{ fila.total }}</div>
+    </div>
+  </div>
+  {% endfor %}
+  <div class="stat-card">
+    <div>
+      <div class="stat-card__label">Tiendas</div>
+      <div class="stat-card__value data-mono">{{ total_tiendas }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-actions">
+  <details class="action-menu">
+    <summary class="btn">+ Nuevo usuario</summary>
+    <div class="action-menu__panel">
+      <a href="{% url 'crear_usuario' role='DISTRIBUTOR' %}">Admin Distribuidor</a>
+      <a href="{% url 'crear_usuario' role='VENDOR' %}">Vendedor</a>
+      <a href="{% url 'crear_usuario' role='STORE_OWNER' %}">Dueño de Tienda</a>
+      <a href="{% url 'crear_usuario' role='DELIVERY' %}">Repartidor</a>
+    </div>
+  </details>
+</div>
+
+<div class="invite-box">
+  <h3>Enlace de registro para dueños de tienda</h3>
+  <p>Comparte este enlace (por WhatsApp o como código QR impreso) para que un dueño de tienda cree su propia cuenta, sin que tengas que registrarlo tú manualmente.</p>
+  <p><code>{{ request.scheme }}://{{ request.get_host }}{% url 'registrar_tienda' distribuidor.invite_token %}</code></p>
+  <form method="post" action="{% url 'regenerar_invite_token' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-secondary"
+            data-confirm-delete
+            data-confirm-title="¿Generar nuevo enlace?"
+            data-confirm-name="el enlace anterior"
+            data-confirm-plain="El enlace anterior dejará de funcionar de inmediato — cualquier persona que aún no lo haya usado necesitará el nuevo.">
+      Generar nuevo enlace
+    </button>
+  </form>
+</div>
+
+<h3>Usuarios</h3>
+<table class="datatable">
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Rol</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in usuarios %}
+    <tr>
+      <td>{{ u.email }}</td>
+      <td>{{ u.role|role_pill:u.get_role_display }}</td>
+      <td>
+        <a href="{% url 'editar_usuario' u.id %}">Editar</a>
+        |
+        <form method="post" action="{% url 'eliminar_usuario' u.id %}" class="inline-form">
+          {% csrf_token %}
+          <button type="submit" class="action-link--danger"
+                  data-confirm-delete
+                  data-confirm-title="¿Eliminar usuario?"
+                  data-confirm-name="{{ u.email }}"
+                  data-confirm-count="{{ u.pedidos_afectados }}"
+                  data-confirm-count-label="pedido(s) asociado(s)">
+            Eliminar
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">
+      <div class="table-empty"><strong>Aún no hay usuarios.</strong>Crea el primero con "+ Nuevo usuario" arriba.</div>
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<hr>
+<h3>Tiendas</h3>
+<div class="page-actions">
+  <a class="btn" href="{% url 'crear_tienda' %}">+ Nueva Tienda</a>
+  <a href="{% url 'mapa_tiendas' %}">Ver mapa</a>
+</div>
+
+<table class="datatable">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Dirección</th>
+      <th>Dueño</th>
+      <th>Vendedor</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tiendas %}
+    <tr>
+      <td>{{ t.name }}</td>
+      <td>{{ t.address }}</td>
+      <td>{{ t.owner.email|default:"—" }}</td>
+      <td>{{ t.vendor.email|default:"Sin asignar" }}</td>
+      <td>
+        <a href="{% url 'editar_tienda' t.id %}">Editar</a>
+        |
+        <form method="post" action="{% url 'eliminar_tienda' t.id %}" class="inline-form">
+          {% csrf_token %}
+          <button type="submit" class="action-link--danger"
+                  data-confirm-delete
+                  data-confirm-title="¿Eliminar tienda?"
+                  data-confirm-name="{{ t.name }}"
+                  data-confirm-count="{{ t.pedidos_afectados }}"
+                  data-confirm-count-label="pedido(s) registrado(s)">
+            Eliminar
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">
+      <div class="table-empty"><strong>Aún no hay tiendas registradas.</strong>Crea la primera con "+ Nueva Tienda" arriba, o comparte el enlace de registro.</div>
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="modal-overlay" id="confirm-modal" hidden>
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-modal-title" aria-describedby="confirm-modal-body">
+    <h3 class="modal__title" id="confirm-modal-title"></h3>
+    <p class="modal__body" id="confirm-modal-body"></p>
+    <div class="modal__actions">
+      <button type="button" class="btn btn-secondary" id="confirm-modal-cancel">Cancelar</button>
+      <button type="button" class="btn btn-danger" id="confirm-modal-confirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Shared confirmation modal for every [data-confirm-delete] button on this
+// page (Eliminar usuario/tienda, Generar nuevo enlace) — replaces the bare
+// browser confirm() so we can show the real consequence (cascade counts)
+// instead of a generic OS dialog. One modal instance, reused per click.
+(function () {
+  var modal = document.getElementById('confirm-modal');
+  if (!modal) return;
+  var titleEl = document.getElementById('confirm-modal-title');
+  var bodyEl = document.getElementById('confirm-modal-body');
+  var confirmBtn = document.getElementById('confirm-modal-confirm');
+  var cancelBtn = document.getElementById('confirm-modal-cancel');
+  var pendingForm = null;
+  var lastFocused = null;
+
+  function closeModal() {
+    modal.hidden = true;
+    pendingForm = null;
+    if (lastFocused) lastFocused.focus();
+  }
+
+  function openModal(btn) {
+    pendingForm = btn.closest('form');
+    lastFocused = document.activeElement;
+    titleEl.textContent = btn.dataset.confirmTitle || '¿Confirmar?';
+
+    bodyEl.innerHTML = '';
+    if (btn.dataset.confirmPlain) {
+      bodyEl.appendChild(document.createTextNode(btn.dataset.confirmPlain));
+    } else {
+      bodyEl.appendChild(document.createTextNode('Se eliminará '));
+      var strongName = document.createElement('strong');
+      strongName.textContent = btn.dataset.confirmName || 'este elemento';
+      bodyEl.appendChild(strongName);
+      bodyEl.appendChild(document.createTextNode(' permanentemente.'));
+
+      var count = parseInt(btn.dataset.confirmCount, 10);
+      if (count > 0) {
+        bodyEl.appendChild(document.createElement('br'));
+        bodyEl.appendChild(document.createTextNode('Tiene '));
+        var strongCount = document.createElement('strong');
+        strongCount.textContent = count;
+        bodyEl.appendChild(strongCount);
+        bodyEl.appendChild(document.createTextNode(' ' + (btn.dataset.confirmCountLabel || 'registro(s) asociado(s)') + ' — ese historial también se perderá.'));
+      }
+    }
+
+    modal.hidden = false;
+    confirmBtn.focus();
+  }
+
+  document.querySelectorAll('[data-confirm-delete]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      openModal(btn);
+    });
+  });
+
+  confirmBtn.addEventListener('click', function () {
+    if (pendingForm) pendingForm.submit();
+  });
+  cancelBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) closeModal();
+  });
+
+  // Focus trap: while the modal is open, Tab/Shift+Tab cycle only between
+  // its two buttons instead of escaping into the page behind the overlay —
+  // otherwise a keyboard/screen-reader user tabs past Confirmar straight
+  // into the sidebar nav while the modal is supposedly blocking the page.
+  document.addEventListener('keydown', function (e) {
+    if (modal.hidden) return;
+    if (e.key === 'Escape') {
+      closeModal();
+      return;
+    }
+    if (e.key === 'Tab') {
+      var focusable = [cancelBtn, confirmBtn];
+      var currentIndex = focusable.indexOf(document.activeElement);
+      var nextIndex = e.shiftKey
+        ? (currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1)
+        : (currentIndex === focusable.length - 1 ? 0 : currentIndex + 1);
+      e.preventDefault();
+      focusable[nextIndex].focus();
+    }
+  });
+})();
+</script>
+{% endblock %}

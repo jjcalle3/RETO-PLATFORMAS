@@ -1,0 +1,104 @@
+﻿{% extends 'base.html' %}
+{% load status_tags %}
+{% block title %}Pedidos{% endblock %}
+{% block content %}
+<h2>Pedidos</h2>
+{% if request.user.role == 'STORE_OWNER' %}
+<div class="page-actions">
+  <a class="btn" href="{% url 'crear_pedido' %}">+ Crear Pedido</a>
+</div>
+{% endif %}
+{% if request.user.role == 'VENDOR' %}
+<p id="polling-status"></p>
+{% endif %}
+
+<table id="pedidos-table" class="datatable" data-order='[[5,"asc"],[6,"asc"]]'>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Tienda</th>
+      <th>Vendedor</th>
+      <th>Estado</th>
+      <th>Creado</th>
+      <th class="dt-hidden">Prioridad</th>
+      <th class="dt-hidden">Creado (orden)</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="pedidos-tbody">
+    {% for p in pedidos %}
+    <tr data-pedido-id="{{ p.id }}">
+      <td class="data-mono">{{ p.id }}</td>
+      <td>{{ p.store }}</td>
+      <td>{{ p.vendor }}</td>
+      <td>{{ p.status|status_pill:p.get_status_display }}</td>
+      <td>{{ p.created_at|date:"d/m/Y H:i" }}</td>
+      <td>{{ p.status|status_priority }}</td>
+      <td>{{ p.created_at|date:"c" }}</td>
+      <td>
+        <a href="{% url 'ver_pedido' p.id %}">Ver</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr id="pedidos-empty-row"><td colspan="8">No hay pedidos.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block extra_js %}
+{% if request.user.role == 'VENDOR' and polling_enabled %}
+<script>
+  var POLL_INTERVAL_MS = {{ poll_interval_ms|default:30000 }};
+// FR-06.6 / US-10: vendor dashboard picks up new pending orders within 30s
+// without a manual page reload. Wrapped in $(document).ready so this queues
+// after base.html's DataTable init (registered first) instead of racing it
+// and initializing the table early with un-configured defaults.
+$(function () {
+  var status = document.getElementById('polling-status');
+  var table = $('#pedidos-table').DataTable();
+  var known = new Set();
+  table.rows().every(function () {
+    var id = $(this.node()).attr('data-pedido-id');
+    if (id) known.add(id);
+  });
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function poll() {
+    fetch('/api/orders/pending/', { headers: { 'Accept': 'application/json' } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var nuevos = data.orders.filter(function (o) { return !known.has(String(o.id)); });
+        if (nuevos.length === 0) {
+          return;
+        }
+        nuevos.forEach(function (o) {
+          known.add(String(o.id));
+          var rowApi = table.row.add([
+            '<span class="data-mono">' + o.id + '</span>',
+            escapeHtml(o.store),
+            '',
+            '<span class="status-pill status-pill--pending">Pendiente</span>',
+            new Date(o.created_at).toLocaleString(),
+            0,
+            o.created_at,
+            '<a href="' + escapeHtml(o.url) + '">Ver</a>'
+          ]);
+          $(rowApi.node()).attr('data-pedido-id', o.id);
+        });
+        table.draw(false);
+        status.textContent = nuevos.length + ' pedido(s) nuevo(s).';
+      })
+      .catch(function () { /* transient network error — try again next tick */ });
+  }
+
+  setInterval(poll, POLL_INTERVAL_MS);
+});
+</script>
+{% endif %}
+{% endblock %}

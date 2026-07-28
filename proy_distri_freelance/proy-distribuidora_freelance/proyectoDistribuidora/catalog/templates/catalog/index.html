@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Catálogo{% endblock %}
+{% block content %}
+<h2>Catálogo</h2>
+<ul>
+  <li><a href="{% url 'index_productos' %}">Productos</a></li>
+  <li><a href="{% url 'inventario' %}">Inventario</a></li>
+  <li><a href="{% url 'index_categorias' %}">Categorías</a></li>
+  <li><a href="{% url 'index_marcas' %}">Marcas</a></li>
+  <li><a href="{% url 'importar_productos' %}">Importar productos (CSV)</a></li>
+  <li><a href="{% url 'mapa_tiendas' %}">Mapa de tiendas</a></li>
+</ul>
+{% endblock %}

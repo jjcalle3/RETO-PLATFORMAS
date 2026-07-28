@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Ajustar Stock{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_productos' %}">← Volver a Productos</a></p>
+<p><strong>{{ producto.name }}</strong> — Stock actual: <span class="data-mono">{{ stock.quantity }}</span> {{ producto.unit_of_measure }} · Almacén: {{ stock.warehouse.name }}</p>
+<p class="form-hint">Usa números positivos para agregar (+5) o negativos para restar (−3). El motivo es obligatorio.</p>
+{% url 'index_productos' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Ajustar stock" submit_label="Aplicar ajuste" cancel_url=url_cancel %}
+{% endblock %}

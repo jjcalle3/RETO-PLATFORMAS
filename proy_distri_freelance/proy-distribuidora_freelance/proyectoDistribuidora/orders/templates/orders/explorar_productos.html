@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Explorar Productos{% endblock %}
+{% block content %}
+<h2>Explorar Productos</h2>
+
+{% if store %}
+<p style="background:#e8f4e8;padding:0.5rem 1rem;border-radius:4px;display:inline-block;">
+  Pedido para: <strong>{{ store.name }}</strong>
+  &nbsp;·&nbsp;
+  <a href="{% url 'carrito' %}">Ver carrito ({{ cart_count }} artículo{{ cart_count|pluralize }})</a>
+</p>
+{% endif %}
+
+<form method="get" style="margin:1rem 0;display:flex;gap:0.5rem;flex-wrap:wrap;">
+  <input type="text" name="q" value="{{ q }}" placeholder="Buscar producto..." style="flex:1;min-width:200px;">
+  <select name="categoria">
+    <option value="">Todas las categorías</option>
+    {% for cat in categorias %}
+    <option value="{{ cat.id }}" {% if categoria_id == cat.id|stringformat:"s" %}selected{% endif %}>
+      {{ cat.name }}
+    </option>
+    {% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
+  {% if q or categoria_id %}<a href="{% url 'explorar_productos' %}" style="align-self:center;">Limpiar</a>{% endif %}
+</form>
+
+{% if display_products %}
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;">
+  {% for item in display_products %}
+  <div style="border:1px solid #ddd;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;">
+    <a href="{% url 'ver_producto_orden' item.product.id %}" style="display:block;">
+      {% if item.main_image %}
+      <img src="{{ item.main_image.image.url }}" alt="{{ item.product.name }}"
+           style="width:100%;height:180px;object-fit:contain;background:#f9f9f9;">
+      {% else %}
+      <div style="width:100%;height:180px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;">
+        <span style="color:#bbb;font-size:0.85rem;">Sin imagen</span>
+      </div>
+      {% endif %}
+    </a>
+    <div style="padding:0.75rem;flex:1;display:flex;flex-direction:column;gap:0.25rem;">
+      <a href="{% url 'ver_producto_orden' item.product.id %}" style="color:inherit;text-decoration:none;">
+        <strong style="font-size:0.95rem;line-height:1.3;">{{ item.product.name }}</strong>
+      </a>
+      <small style="color:#666;">{{ item.product.category.name|default:"" }}</small>
+      <span style="font-size:1.1rem;font-weight:bold;">${{ item.price }}</span>
+      {% if item.stock > 0 %}
+        <small style="color:green;">En stock: {{ item.stock }}</small>
+      {% else %}
+        <small style="color:#c00;">Sin stock</small>
+      {% endif %}
+      {% if item.in_cart %}
+        <small style="color:#0070c0;">En carrito: {{ item.in_cart }}</small>
+      {% endif %}
+      <form method="post" style="margin-top:auto;padding-top:0.5rem;display:flex;gap:0.25rem;">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ item.product.id }}">
+        <input type="number" name="quantity" value="{{ item.in_cart|default:1 }}" min="1"
+               style="width:4rem;">
+        <button type="submit" style="flex:1;">
+          {% if item.in_cart %}Actualizar{% else %}Agregar{% endif %}
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p>No hay productos disponibles{% if q or categoria_id %} para este filtro{% endif %}.</p>
+{% endif %}
+{% endblock %}

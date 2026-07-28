@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Nueva Categoría</title>
+  <style>body{font-family:sans-serif;padding:1.5rem}</style>
+</head>
+<body>
+<h3>Nueva Categoría</h3>
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="popup" value="1">
+  {{ formulario.as_p }}
+  <button type="submit">Guardar</button>
+</form>
+</body>
+</html>

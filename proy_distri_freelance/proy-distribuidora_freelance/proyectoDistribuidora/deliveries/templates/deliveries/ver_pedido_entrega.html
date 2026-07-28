@@ -1,0 +1,92 @@
+﻿{% extends 'base.html' %}
+{% block title %}Pedido #{{ order.id }} — Entrega{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_deliveries' %}">← Cola de entregas</a></p>
+
+<h2>Pedido #{{ order.id }}</h2>
+
+<div style="background:#f9f9f9;border:1px solid #ddd;border-radius:8px;padding:1rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:0.35rem;">
+  <strong style="font-size:1.05rem;">{{ order.store.name }}</strong>
+  {% if order.store.address %}
+  <span style="color:#555;">{{ order.store.address }}</span>
+  {% endif %}
+  {% if order.store.phone_number %}
+  <span style="color:#555;">Tel: {{ order.store.phone_number }}</span>
+  {% endif %}
+
+  <div style="margin-top:0.4rem;">
+    {% if order.store.latitude and order.store.longitude %}
+    <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.store.latitude }},{{ order.store.longitude }}"
+       target="_blank" rel="noopener noreferrer" class="touch-target"
+       style="border:1px solid #0070c0;border-radius:4px;color:#0070c0;text-decoration:none;font-size:0.9rem;">
+      Cómo llegar ↗
+    </a>
+    {% elif order.store.address %}
+    <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.store.address|urlencode }}"
+       target="_blank" rel="noopener noreferrer" class="touch-target"
+       style="border:1px solid #0070c0;border-radius:4px;color:#0070c0;text-decoration:none;font-size:0.9rem;">
+      Cómo llegar ↗
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<h3>Productos</h3>
+<table class="datatable">
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th style="text-align:right;">Cantidad</th>
+      <th style="text-align:right;">Precio unit.</th>
+      <th style="text-align:right;">Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in order.items.all %}
+    <tr>
+      <td>{{ item.product.name }}</td>
+      <td class="data-mono" style="text-align:right;">{{ item.quantity }}</td>
+      <td class="data-mono" style="text-align:right;">${{ item.unit_price_at_time }}</td>
+      <td class="data-mono" style="text-align:right;">${{ item.unit_price_at_time|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3" style="text-align:right;"><strong>Total</strong></td>
+      <td class="data-mono" style="text-align:right;"><strong>${{ order_total }}</strong></td>
+    </tr>
+  </tfoot>
+</table>
+
+{% if order.issue_description %}
+<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:1rem;margin-top:1.5rem;">
+  <strong style="color:#856404;">Incidencia reportada</strong>
+  {% if order.issue_reported_at %}
+  <small style="color:#888;"> — {{ order.issue_reported_at|date:"d/m/Y H:i" }}</small>
+  {% endif %}
+  <p style="margin:0.5rem 0 0;">{{ order.issue_description|linebreaksbr }}</p>
+</div>
+{% if order.resolution_notes %}
+<div style="background:#d1e7dd;border:1px solid #0f5132;border-radius:8px;padding:1rem;margin-top:0.75rem;">
+  <strong style="color:#0f5132;">Resolución</strong>
+  {% if order.resolved_at %}
+  <small style="color:#888;"> — {{ order.resolved_at|date:"d/m/Y H:i" }}</small>
+  {% endif %}
+  <p style="margin:0.5rem 0 0;">{{ order.resolution_notes|linebreaksbr }}</p>
+</div>
+{% endif %}
+{% endif %}
+
+{% if is_dispatched %}
+<form method="post" action="{% url 'confirmar_entrega' order.id %}">
+  {% csrf_token %}
+  <button type="submit" class="touch-target"
+          style="background:#28a745;color:#fff;border:none;border-radius:4px;font-size:1rem;cursor:pointer;">
+    Confirmar Entrega ✓
+  </button>
+</form>
+{% else %}
+<p style="color:#666;font-style:italic;">Este pedido ya fue confirmado o no está disponible para entrega.</p>
+{% endif %}
+{% endblock %}

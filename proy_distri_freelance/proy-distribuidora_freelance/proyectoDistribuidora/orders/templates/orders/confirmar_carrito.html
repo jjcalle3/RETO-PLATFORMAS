@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Confirmar Pedido{% endblock %}
+{% block content %}
+<h2>Confirmar pedido — {{ store.name }}</h2>
+{% include 'partials/checkout_stepper.html' with current=2 error=errores %}
+
+{% if errores %}
+<div class="cart-errors">
+  <p class="cart-errors__title">No se pudo confirmar el pedido — revisa el stock disponible:</p>
+  <ul>
+    {% for e in errores %}<li>{{ e }}</li>{% endfor %}
+  </ul>
+  <a class="btn btn-secondary" href="{% url 'carrito' %}">← Volver al carrito y ajustar</a>
+</div>
+{% endif %}
+
+<div class="cart-layout">
+  <div class="cart-main">
+    <div class="cart-card">
+      {% for item in display_items %}
+      <div class="cart-item cart-item--static">
+        <div class="cart-item__media">
+          {% if item.main_image %}
+            <img src="{{ item.main_image.image.url }}" alt="">
+          {% else %}
+            <span class="cart-item__ph" aria-hidden="true">{{ item.product.name|slice:":1" }}</span>
+          {% endif %}
+        </div>
+        <div class="cart-item__info">
+          <span class="cart-item__name">{{ item.product.name }}</span>
+          <span class="cart-item__price data-mono">${{ item.unit_price }} c/u</span>
+        </div>
+        <div class="cart-item__qty data-mono">× {{ item.quantity }}</div>
+        <div class="cart-item__subtotal data-mono">${{ item.subtotal }}</div>
+      </div>
+      {% empty %}
+      <div class="cart-empty"><p>Sin productos.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="cart-summary">
+    <h3>Resumen</h3>
+    <div class="cart-summary__row"><span>Productos</span><span class="data-mono">{{ display_items|length }}</span></div>
+    <div class="cart-summary__row cart-summary__row--total"><span>Total</span><span class="data-mono">${{ cart_total }}</span></div>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="cart-summary__cta">Confirmar y enviar al vendedor</button>
+    </form>
+    <a class="cart-summary__back" href="{% url 'carrito' %}">← Volver al carrito</a>
+    <p class="cart-summary__note">Al confirmar, el vendedor recibirá este pedido y podrá aceptarlo o rechazarlo.</p>
+  </aside>
+</div>
+{% endblock %}

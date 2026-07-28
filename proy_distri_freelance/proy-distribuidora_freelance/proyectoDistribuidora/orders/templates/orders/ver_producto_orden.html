@@ -1,0 +1,51 @@
+﻿{% extends 'base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'explorar_productos' %}">← Volver a productos</a></p>
+
+<h2>{{ product.name }}</h2>
+
+<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+  {% for img in images %}
+  <img src="{{ img.image.url }}" alt="{{ product.name }}"
+       style="height:200px;width:auto;object-fit:contain;border:1px solid #ddd;border-radius:4px;">
+  {% empty %}
+  <div style="height:200px;width:300px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border-radius:4px;">
+    <span style="color:#bbb;">Sin imágenes</span>
+  </div>
+  {% endfor %}
+</div>
+
+<table>
+  <tr><th style="text-align:left;">Categoría</th><td>{{ product.category.name|default:"—" }}</td></tr>
+  <tr><th style="text-align:left;">Marca</th><td>{{ product.brand.name|default:"—" }}</td></tr>
+  <tr><th style="text-align:left;">SKU</th><td class="data-mono">{{ product.sku|default:"—" }}</td></tr>
+  <tr><th style="text-align:left;">Unidad</th><td>{{ product.unit_of_measure|default:"—" }}</td></tr>
+  <tr><th style="text-align:left;">Precio</th><td class="data-mono"><strong>${{ price }}</strong></td></tr>
+  <tr><th style="text-align:left;">Stock total</th><td class="data-mono">{{ stock }}</td></tr>
+</table>
+
+{% if stock_levels %}
+<h3>Stock por bodega</h3>
+<table class="datatable">
+  <thead><tr><th>Bodega</th><th>Cantidad</th></tr></thead>
+  <tbody>
+    {% for sl in stock_levels %}
+    <tr><td>{{ sl.warehouse.name }}</td><td>{{ sl.quantity }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<h3>Agregar al carrito</h3>
+<form method="post" style="display:flex;align-items:center;gap:0.5rem;">
+  {% csrf_token %}
+  <label>Cantidad:
+    <input type="number" name="quantity" value="{{ in_cart|default:1 }}" min="1" style="width:5rem;">
+  </label>
+  <button type="submit">{% if in_cart %}Actualizar en carrito{% else %}Agregar al carrito{% endif %}</button>
+</form>
+{% if in_cart %}
+<p style="margin-top:0.5rem;"><a href="{% url 'carrito' %}">Ver carrito ({{ cart_count }} artículo{{ cart_count|pluralize }})</a></p>
+{% endif %}
+{% endblock %}

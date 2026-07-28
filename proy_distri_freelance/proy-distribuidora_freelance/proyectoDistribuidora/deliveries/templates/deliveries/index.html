@@ -1,0 +1,239 @@
+﻿{% extends 'base.html' %}
+{% block title %}Cola de Entregas{% endblock %}
+{% block content %}
+<h2>Cola de Entregas</h2>
+
+{% if pending %}
+<h3 style="margin-bottom:0.5rem;">Pendientes de entrega</h3>
+<div id="pending-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:2rem;">
+  {% for order in pending %}
+  <div class="delivery-card" data-order-id="{{ order.id }}" style="border:1px solid #ddd;border-radius:8px;padding:1rem;display:flex;flex-direction:column;gap:0.4rem;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <strong style="font-size:1rem;">{{ order.store.name }}</strong>
+      <span class="status-pill status-pill--dispatched">Despachado</span>
+    </div>
+
+    {% if order.store.address %}
+    <span style="color:#555;font-size:0.875rem;">{{ order.store.address }}</span>
+    {% endif %}
+    {% if order.store.phone_number %}
+    <span style="color:#555;font-size:0.875rem;">Tel: {{ order.store.phone_number }}</span>
+    {% endif %}
+
+    <div style="font-size:0.85rem;color:#444;margin-top:0.25rem;">
+      {% for item in order.items.all|slice:":3" %}
+        <div>· {{ item.product.name }} × {{ item.quantity }}</div>
+      {% endfor %}
+      {% if order.items.count > 3 %}
+        <div style="color:#888;">…y {{ order.items.count|add:"-3" }} producto{{ order.items.count|add:"-3"|pluralize }} más</div>
+      {% endif %}
+    </div>
+
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+      {% if order.store.latitude and order.store.longitude %}
+      <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.store.latitude }},{{ order.store.longitude }}"
+         target="_blank" rel="noopener noreferrer" class="touch-target"
+         style="font-size:0.85rem;border:1px solid #0070c0;border-radius:4px;color:#0070c0;text-decoration:none;">
+        Cómo llegar ↗
+      </a>
+      {% elif order.store.address %}
+      <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.store.address|urlencode }}"
+         target="_blank" rel="noopener noreferrer" class="touch-target"
+         style="font-size:0.85rem;border:1px solid #0070c0;border-radius:4px;color:#0070c0;text-decoration:none;">
+        Cómo llegar ↗
+      </a>
+      {% endif %}
+
+      <a href="{% url 'ver_pedido_entrega' order.id %}" class="touch-target"
+         style="font-size:0.85rem;border:1px solid #555;border-radius:4px;color:#555;text-decoration:none;">
+        Ver detalles
+      </a>
+
+      {% if user.role == 'DELIVERY' %}
+      <form method="post" action="{% url 'confirmar_entrega' order.id %}" class="confirm-entrega-form" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" class="touch-target"
+                style="font-size:0.85rem;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;">
+          Confirmar Entrega ✓
+        </button>
+      </form>
+      <p class="confirm-error error" style="margin:0.25rem 0 0;" hidden></p>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p id="pending-empty-msg" style="color:#666;margin-bottom:2rem;">No hay pedidos despachados pendientes de entrega.</p>
+{% endif %}
+
+<h3 style="margin-bottom:0.5rem;">Incidencias reportadas</h3>
+{% if issues %}
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-bottom:2rem;">
+  {% for order in issues %}
+  <div style="border:1px solid #ffc107;border-radius:8px;padding:1rem;display:flex;flex-direction:column;gap:0.4rem;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <strong style="font-size:1rem;">{{ order.store.name }}</strong>
+      <span class="status-pill status-pill--delivery_issue">Con incidencia</span>
+    </div>
+    {% if order.store.address %}
+    <span style="color:#555;font-size:0.875rem;">{{ order.store.address }}</span>
+    {% endif %}
+    {% if order.issue_description %}
+    <p style="margin:0.25rem 0;font-size:0.875rem;color:#444;"><strong>Problema:</strong> {{ order.issue_description|truncatechars:120 }}</p>
+    {% endif %}
+    {% if order.issue_reported_at %}
+    <small style="color:#888;">Reportado: {{ order.issue_reported_at|date:"d/m/Y H:i" }}</small>
+    {% endif %}
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+      <a href="{% url 'ver_pedido_entrega' order.id %}" class="touch-target"
+         style="font-size:0.85rem;border:1px solid #555;border-radius:4px;color:#555;text-decoration:none;">
+        Ver detalles
+      </a>
+      {% if user.role == 'DISTRIBUTOR' %}
+      <a href="{% url 'resolver_incidencia' order.id %}" class="touch-target"
+         style="font-size:0.85rem;border:1px solid #c00;border-radius:4px;color:#c00;text-decoration:none;">
+        Resolver incidencia
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p style="color:#666;margin-bottom:2rem;">Sin incidencias activas.</p>
+{% endif %}
+
+<h3 style="margin-bottom:0.5rem;">Historial de entregas</h3>
+{% if history %}
+<table id="historial-table" class="datatable" data-order='[[4,"desc"]]'>
+  <thead>
+    <tr>
+      <th>Pedido</th>
+      <th>Tienda</th>
+      <th>Repartidor</th>
+      <th>Confirmado en</th>
+      <th class="dt-hidden">Confirmado en (orden)</th>
+      {% if user.role == 'DISTRIBUTOR' or user.role == 'DELIVERY' %}<th></th>{% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in history %}
+    <tr>
+      <td class="data-mono">#{{ c.order.id }}</td>
+      <td>{{ c.order.store.name }}</td>
+      <td>{{ c.delivery_user.email }}</td>
+      <td>{{ c.confirmed_at|date:"d/m/Y H:i" }}</td>
+      <td>{{ c.confirmed_at|date:"c" }}</td>
+      {% if user.role == 'DISTRIBUTOR' %}
+      <td>
+        <a href="{% url 'editar_confirmacion' c.id %}">Editar</a> |
+        <a href="{% url 'eliminar_confirmacion' c.id %}"
+           onclick="return confirm('¿Eliminar confirmación?')">Eliminar</a>
+      </td>
+      {% elif user.role == 'DELIVERY' %}
+      <td><a href="{% url 'ver_pedido_entrega' c.order.id %}">Ver detalles</a></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p style="color:#666;">Sin entregas registradas aún.</p>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if user.role == 'DELIVERY' %}
+<script>
+// DESIGN.md "Interaction States" — Confirmar Entrega: optimistic UI (mark
+// confirmed instantly), a "Sincronizando…" indicator until the server
+// round-trip settles, and a full revert + retry on failure so a tap is
+// never silently lost.
+$(function () {
+  var VER_DETALLES_URL_TEMPLATE = '{% url "ver_pedido_entrega" 0 %}';
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function showEmptyPendingMessageIfNeeded() {
+    var grid = document.getElementById('pending-grid');
+    if (grid && grid.children.length === 0) {
+      var msg = document.createElement('p');
+      msg.id = 'pending-empty-msg';
+      msg.style.color = '#666';
+      msg.style.marginBottom = '2rem';
+      msg.textContent = 'No hay pedidos despachados pendientes de entrega.';
+      grid.replaceWith(msg);
+    }
+  }
+
+  document.querySelectorAll('.confirm-entrega-form').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var card = form.closest('.delivery-card');
+      var button = form.querySelector('button[type="submit"]');
+      var pill = card.querySelector('.status-pill');
+      var errorEl = card.querySelector('.confirm-error');
+      var originalButtonText = button.textContent;
+
+      errorEl.hidden = true;
+      errorEl.textContent = '';
+      button.disabled = true;
+      button.textContent = 'Sincronizando…';
+      pill.className = 'status-pill status-pill--confirmed';
+      pill.textContent = 'Confirmado';
+
+      fetch(form.action, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+        body: new FormData(form),
+      })
+        .then(function (res) {
+          return res.json()
+            .catch(function () { return {}; })
+            .then(function (data) { return { ok: res.ok, data: data }; });
+        })
+        .then(function (result) {
+          if (!result.ok || !result.data.success) {
+            throw new Error((result.data && result.data.error) || 'No se pudo confirmar la entrega.');
+          }
+          pill.classList.add('status-pill--flash');
+          setTimeout(function () {
+            var $historial = $('#historial-table');
+            if ($historial.length) {
+              $historial.DataTable().row.add([
+                '<span class="data-mono">#' + result.data.order_id + '</span>',
+                escapeHtml(result.data.store_name),
+                escapeHtml(result.data.delivery_user),
+                new Date(result.data.confirmed_at).toLocaleString(),
+                result.data.confirmed_at,
+                '<a href="' + VER_DETALLES_URL_TEMPLATE.replace('/0/', '/' + result.data.order_id + '/') + '">Ver detalles</a>',
+              ]).draw(false);
+            }
+            card.style.transition = 'opacity 200ms ease-in';
+            card.style.opacity = '0';
+            setTimeout(function () {
+              card.remove();
+              showEmptyPendingMessageIfNeeded();
+            }, 200);
+          }, 250);
+        })
+        .catch(function (err) {
+          // Revert — never silently lose the tap.
+          button.disabled = false;
+          button.textContent = originalButtonText;
+          pill.className = 'status-pill status-pill--dispatched';
+          pill.textContent = 'Despachado';
+          errorEl.textContent = err.message;
+          errorEl.hidden = false;
+        });
+    });
+  });
+});
+</script>
+{% endif %}
+{% endblock %}

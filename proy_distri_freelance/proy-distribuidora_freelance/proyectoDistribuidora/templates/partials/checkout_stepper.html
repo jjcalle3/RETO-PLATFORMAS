@@ -1,0 +1,31 @@
+{% comment %}
+Checkout progress stepper (happy path). Three fixed steps of the store-owner
+order flow, with progress + an error state.
+
+Params (via {% include ... with %}):
+  current — 1-based index of the active step (1=Carrito, 2=Confirmar, 3=Enviado)
+  error   — truthy to render the current step in an error state (red)
+
+Step before current = "done" (check); step at current = "active" (or "error");
+steps after = "upcoming".
+{% endcomment %}
+<ol class="stepper" aria-label="Progreso del pedido">
+  <li class="stepper__step{% if 1 < current %} is-done{% elif 1 == current and error %} is-error{% elif 1 == current %} is-active{% endif %}">
+    <span class="stepper__marker" aria-hidden="true">
+      {% if 1 < current %}<svg viewBox="0 0 20 20"><path d="M5 10.5l3.5 3.5L15 6"/></svg>{% elif 1 == current and error %}!{% else %}1{% endif %}
+    </span>
+    <span class="stepper__label">Carrito</span>
+  </li>
+  <li class="stepper__step{% if 2 < current %} is-done{% elif 2 == current and error %} is-error{% elif 2 == current %} is-active{% endif %}">
+    <span class="stepper__marker" aria-hidden="true">
+      {% if 2 < current %}<svg viewBox="0 0 20 20"><path d="M5 10.5l3.5 3.5L15 6"/></svg>{% elif 2 == current and error %}!{% else %}2{% endif %}
+    </span>
+    <span class="stepper__label">Confirmar</span>
+  </li>
+  <li class="stepper__step stepper__step--last{% if 3 < current %} is-done{% elif 3 == current and error %} is-error{% elif 3 == current %} is-active{% endif %}">
+    <span class="stepper__marker" aria-hidden="true">
+      {% if 3 < current %}<svg viewBox="0 0 20 20"><path d="M5 10.5l3.5 3.5L15 6"/></svg>{% elif 3 == current and error %}!{% else %}3{% endif %}
+    </span>
+    <span class="stepper__label">Enviado</span>
+  </li>
+</ol>

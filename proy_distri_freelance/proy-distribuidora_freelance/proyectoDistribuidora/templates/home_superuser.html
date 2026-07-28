@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Panel de Administración — ISBEN Solutions{% endblock %}
+{% block content %}
+<h2>Panel de Administración</h2>
+<p>Bienvenido, {{ user.email }}. Desde aquí puedes gestionar los distribuidores y sus accesos a la plataforma.</p>
+
+<section>
+  <h3>Distribuidores registrados</h3>
+  {% if distribuidores %}
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in distribuidores %}
+      <tr>
+        <td>{{ d.name }}</td>
+        <td>{{ d.email }}</td>
+        <td>
+          <a href="{% url 'obtener_distribuidor' d.id %}">Ver</a>
+          &nbsp;·&nbsp;
+          <a href="{% url 'editar_distribuidor' d.id %}">Editar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No hay distribuidores registrados aún.</p>
+  {% endif %}
+  <div class="page-actions">
+    <a class="btn" href="{% url 'crear_distribuidor' %}">+ Crear distribuidor manualmente</a>
+    <a class="btn btn-secondary" href="{% url 'emitir_invitacion' %}">Emitir invitación de autoregistro</a>
+    <a class="btn btn-secondary" href="{% url 'invitaciones' %}">Ver todas las invitaciones</a>
+  </div>
+</section>
+
+<section>
+  <h3>Nota — Base SaaS multi-tenant</h3>
+  <p>
+    Cada distribuidor es un tenant aislado: sus productos, tiendas, usuarios y pedidos nunca se mezclan
+    con los de otro distribuidor. El modelo de datos y la capa de aislamiento de queries ya están
+    diseñados para soportar múltiples distribuidores de forma simultánea, sentando la base para
+    evolucionar esta plataforma hacia un producto SaaS. Ver <strong>Tier 6 Item 4</strong> en
+    <code>docs/TODOS.md</code> para el plan de dashboard super-administrador y la arquitectura
+    multi-tenant completa.
+  </p>
+</section>
+{% endblock %}

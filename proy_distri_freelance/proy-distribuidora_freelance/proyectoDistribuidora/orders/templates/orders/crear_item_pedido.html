@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load status_tags %}
+{% block title %}Agregar Item — Pedido #{{ pedido.id }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'ver_pedido' pedido.id %}">← Volver al pedido</a></p>
+<p>
+  Tienda: <strong>{{ pedido.store }}</strong> |
+  Vendedor: <strong>{{ pedido.vendor }}</strong> |
+  Estado: {{ pedido.status|status_pill:pedido.get_status_display }}
+</p>
+{% url 'ver_pedido' pedido.id as url_cancel %}
+{% with pid=pedido.id|stringformat:"s" %}
+{% include 'partials/form_card.html' with formulario=formulario title="Agregar Item — Pedido #"|add:pid cancel_url=url_cancel %}
+{% endwith %}
+{% endblock %}

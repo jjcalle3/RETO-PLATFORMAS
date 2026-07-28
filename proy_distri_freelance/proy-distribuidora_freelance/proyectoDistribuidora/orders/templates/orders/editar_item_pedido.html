@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Editar Item — Pedido #{{ item.order.id }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'ver_pedido' item.order.id %}">← Volver al pedido</a></p>
+<p>Producto: <strong>{{ item.product }}</strong> · Pedido #{{ item.order.id }}</p>
+{% url 'ver_pedido' item.order.id as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Editar Item" submit_label="Actualizar" cancel_url=url_cancel %}
+{% endblock %}

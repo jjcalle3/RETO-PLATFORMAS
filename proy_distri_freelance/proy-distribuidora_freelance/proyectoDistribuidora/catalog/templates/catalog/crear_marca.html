@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Nueva Marca{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_marcas' %}">← Volver al Catálogo</a></p>
+{% url 'index_marcas' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Nueva Marca" cancel_url=url_cancel %}
+{% endblock %}

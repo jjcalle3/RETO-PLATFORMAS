@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Productos{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_catalog' %}">← Catálogo</a></p>
+<h2>Productos</h2>
+<div class="page-actions">
+  <a class="btn" href="{% url 'crear_producto' %}">+ Nuevo Producto</a>
+  <a class="btn btn-secondary" href="{% url 'importar_productos' %}">+ Importar CSV</a>
+</div>
+
+<div class="filter-bar">
+  <form method="get" class="filter-bar__form">
+    <div class="filter-field filter-field--wide">
+      <label for="filter-q">Buscar</label>
+      <input type="text" id="filter-q" name="q" value="{{ filtros.q }}" placeholder="Nombre, SKU o código de barras">
+    </div>
+    <div class="filter-field">
+      <label for="filter-category">Categoría</label>
+      <select id="filter-category" name="category">
+        <option value="">Todas</option>
+        {% for c in categorias %}
+        <option value="{{ c.id }}" {% if filtros.category == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="filter-brand">Marca</label>
+      <select id="filter-brand" name="brand">
+        <option value="">Todas</option>
+        {% for m in marcas %}
+        <option value="{{ m.id }}" {% if filtros.brand == m.id|stringformat:"s" %}selected{% endif %}>{{ m.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="filter-field">
+      <label for="filter-stock-status">Estado de stock</label>
+      <select id="filter-stock-status" name="stock_status">
+        <option value="">Todos</option>
+        <option value="in_stock" {% if filtros.stock_status == "in_stock" %}selected{% endif %}>En stock</option>
+        <option value="low" {% if filtros.stock_status == "low" %}selected{% endif %}>Stock bajo</option>
+        <option value="out" {% if filtros.stock_status == "out" %}selected{% endif %}>Agotado</option>
+      </select>
+    </div>
+    <div class="filter-field filter-field--checkbox">
+      <input type="checkbox" id="filter-only-on-sale" name="only_on_sale" value="1" {% if filtros.only_on_sale %}checked{% endif %}>
+      <label for="filter-only-on-sale">Solo en promoción</label>
+    </div>
+    <div class="filter-field filter-field--actions">
+      <button type="submit" class="btn">Buscar</button>
+      <a href="{% url 'index_productos' %}" class="btn btn-secondary">Limpiar</a>
+    </div>
+  </form>
+</div>
+
+<div class="table-scroll">
+<table class="datatable" data-server-search="true">
+  <thead>
+    <tr>
+      <th>SKU</th>
+      <th>Nombre</th>
+      <th>Categoría</th>
+      <th>Marca</th>
+      <th>Precio</th>
+      <th>Precio con descuento</th>
+      <th>Estado</th>
+      <th>Stock</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in productos %}
+    <tr>
+      <td class="data-mono">{{ p.sku }}</td>
+      <td>{{ p.name }}</td>
+      <td>{{ p.category }}</td>
+      <td>{{ p.brand }}</td>
+      <td class="data-mono">${{ p.unit_price }}</td>
+      <td>
+        {% with descuento=p.active_discount %}
+          {% if descuento %}<span class="data-mono">${{ p.current_price }}</span>{% else %}—{% endif %}
+        {% endwith %}
+      </td>
+      <td>
+        {{ p.get_status_display }}
+        {% if p.is_out_of_stock %} — ⚠ Agotado{% elif p.total_stock < p.low_stock_threshold %} — ⚠ Stock bajo{% endif %}
+      </td>
+      <td class="data-mono">{{ p.total_stock }}</td>
+      <td>
+        <a href="{% url 'editar_producto' p.id %}">Editar</a> |
+        {% if p.status == 'ACTIVE' %}
+          <a href="{% url 'eliminar_producto' p.id %}" onclick="return confirm('¿Desactivar producto {{ p.name }}?')">Desactivar</a>
+        {% else %}
+          <a href="{% url 'reactivar_producto' p.id %}">Reactivar</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="9">
+      {% if filtros.q or filtros.category or filtros.brand or filtros.stock_status or filtros.only_on_sale %}
+        No se encontraron productos con estos filtros. <a href="{% url 'index_productos' %}">Limpiar filtros</a>
+      {% else %}
+        No hay productos.
+      {% endif %}
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

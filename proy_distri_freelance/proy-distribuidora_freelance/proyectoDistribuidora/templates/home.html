@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}ISBEN Solutions — Distribución, ordenada de punta a punta{% endblock %}
+{% block content_class %}page-section--flush{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/home-tailwind.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="bg-canvas">
+  <div class="mx-auto max-w-7xl px-6 py-16 sm:px-8 md:py-24 lg:py-28">
+    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-[55%_45%]">
+      <div>
+        <h1 class="font-display text-[2.25rem] font-bold leading-[1.1] text-ink sm:text-[2.75rem] lg:text-[4rem] lg:leading-[1.05]">
+          Tu distribuidora, <span class="text-orange">en su punto</span>.
+        </h1>
+        <p class="mt-6 max-w-xl font-body text-base leading-relaxed text-ink/80 md:text-lg">
+          ISBEN Solutions ordena el pedido desde que nace hasta que llega a la tienda — catálogo, inventario, despacho y entrega, todo en un solo lugar, con el control que tu operación necesita.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-6">
+          <a href="#solicitar-demo" class="btn-pill btn-pill-primary">Solicitar una demo</a>
+          <a href="{% url 'login' %}" class="font-body text-sm font-semibold text-ink underline decoration-orange decoration-2 underline-offset-4 hover:text-orange">
+            Iniciar sesión →
+          </a>
+        </div>
+      </div>
+
+      <div class="relative mx-auto w-full max-w-sm">
+        <div class="relative rotate-[-4deg] rounded-3xl border border-ink/10 bg-cream p-10 shadow-[0_20px_60px_-20px_rgba(35,26,22,0.2)]">
+          <img src="{% static 'media/iso_1.png' %}" alt="Isotipo de ISBEN Solutions: una cabeza de leopardo estilizada en línea, en degradado naranja a dorado" class="mx-auto h-auto w-full max-w-[220px]">
+        </div>
+        <div class="absolute -bottom-5 right-2 rotate-[3deg] rounded-2xl bg-ink px-4 py-2 font-mono text-[11px] uppercase tracking-[0.08em] text-cream shadow-lg">
+          Confirmado ✓
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Qué es -->
+<section class="bg-cream">
+  <div class="mx-auto max-w-7xl px-6 py-16 sm:px-8 md:py-20">
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
+      <div>
+        <span class="font-mono text-[13px] uppercase tracking-[0.08em] text-slate">Qué es</span>
+        <h2 class="mt-3 font-display text-3xl font-semibold text-ink md:text-4xl">ISBEN Solutions</h2>
+        <p class="mt-5 max-w-lg font-body text-base leading-relaxed text-ink/80 md:text-lg">
+          ISBEN Solutions es la plataforma donde tu distribuidora gestiona catálogo, inventario, pedidos y entregas sin depender de hojas de cálculo ni de llamadas. Hoy ya la usan operaciones reales; mañana, cada distribuidora que se sume tendrá su propio espacio cerrado — sus productos, su equipo, sus reglas, sin mezclarse con nadie más.
+        </p>
+      </div>
+      <ul class="grid gap-5 self-start">
+        <li class="rounded-2xl border border-ink/10 bg-canvas p-5">
+          <p class="font-display text-lg font-semibold text-ink">Catálogo e inventario en tiempo real</p>
+          <p class="mt-1 font-body text-sm text-ink/70">Stock por bodega, alertas de stock bajo y precios siempre al día.</p>
+        </li>
+        <li class="rounded-2xl border border-ink/10 bg-canvas p-5">
+          <p class="font-display text-lg font-semibold text-ink">Pedidos con trazabilidad de extremo a extremo</p>
+          <p class="mt-1 font-body text-sm text-ink/70">Cada pedido queda registrado desde que se crea hasta que se confirma en tienda.</p>
+        </li>
+        <li class="rounded-2xl border border-ink/10 bg-canvas p-5">
+          <p class="font-display text-lg font-semibold text-ink">Espacio aislado por distribuidora</p>
+          <p class="mt-1 font-body text-sm text-ink/70">Pensado para crecer: cada distribuidora opera en su propio entorno, separado del resto.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Cómo funciona -->
+<section class="bg-canvas">
+  <div class="mx-auto max-w-7xl px-6 py-16 sm:px-8 md:py-20">
+    <div class="max-w-2xl">
+      <span class="font-mono text-[13px] uppercase tracking-[0.08em] text-slate">Cómo funciona</span>
+      <h2 class="mt-3 font-display text-3xl font-semibold text-ink md:text-4xl">Cuatro roles, un mismo pedido</h2>
+    </div>
+
+    <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <article class="rounded-3xl border border-ink/10 bg-cream p-7">
+        <h3 class="font-display text-xl font-semibold text-ink">Distribuidor</h3>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">Organiza el catálogo, controla el inventario y tiene visibilidad total de cada pedido, desde que se crea hasta que se confirma en tienda.</p>
+        <p class="mt-4 font-body text-sm font-semibold text-ink">Tu operación, tus reglas, tu equipo.</p>
+      </article>
+
+      <article class="rounded-3xl border border-ink/10 bg-cream p-7">
+        <h3 class="font-display text-xl font-semibold text-ink">Dueño de tienda</h3>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">Crea sus pedidos, sigue cada estado en tiempo real y confirma la recepción — o reporta un problema si algo no llegó bien.</p>
+        <p class="mt-4 font-body text-sm font-semibold text-ink">Pide lo que necesita, cuando lo necesita.</p>
+      </article>
+
+      <article class="rounded-3xl border border-ink/10 bg-cream p-7">
+        <h3 class="font-display text-xl font-semibold text-ink">Vendedor</h3>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">Recibe los pedidos entrantes, verifica stock y decide: aceptar, despachar o rechazar — todo con el inventario actualizándose al instante.</p>
+        <p class="mt-4 font-body text-sm font-semibold text-ink">De pedido a despachado, sin perder el hilo.</p>
+      </article>
+
+      <article class="rounded-3xl border border-ink/10 bg-cream p-7">
+        <h3 class="font-display text-xl font-semibold text-ink">Repartidor</h3>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">Ve las entregas listas para salir, las marca como entregadas y deja constancia — la tienda confirma la recepción del otro lado.</p>
+        <p class="mt-4 font-body text-sm font-semibold text-ink">El último paso, con evidencia.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="bg-cream" id="faq">
+  <div class="mx-auto max-w-3xl px-6 py-16 sm:px-8 md:py-20">
+    <span class="font-mono text-[13px] uppercase tracking-[0.08em] text-slate">Preguntas frecuentes</span>
+    <h2 class="mt-3 font-display text-3xl font-semibold text-ink md:text-4xl">Antes de escribirnos</h2>
+
+    <div class="mt-8 divide-y divide-ink/10 border-t border-b border-ink/10">
+      <details class="group py-5">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-base font-semibold text-ink">
+          ¿Cuánto cuesta?
+          <span class="shrink-0 font-body text-xl leading-none text-orange transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">Estamos en acceso anticipado: escríbenos y conversamos un plan a la medida de tu operación antes de cualquier cobro.</p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-base font-semibold text-ink">
+          ¿Mis datos se mezclan con los de otra distribuidora?
+          <span class="shrink-0 font-body text-xl leading-none text-orange transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">No. Cada distribuidora tiene su propio espacio aislado — catálogo, usuarios, pedidos e inventario separados por diseño, no por configuración.</p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-base font-semibold text-ink">
+          ¿Necesito instalar algo?
+          <span class="shrink-0 font-body text-xl leading-none text-orange transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">No. ISBEN Solutions funciona desde el navegador, en computadora o celular, sin instaladores ni servidores propios.</p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-base font-semibold text-ink">
+          ¿Qué significa "acceso anticipado"?
+          <span class="shrink-0 font-body text-xl leading-none text-orange transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">Que la plataforma ya está operando con reglas de negocio reales — control de roles, historial de auditoría, manejo seguro de inventario concurrente — pero seguimos sumando funciones junto a las primeras distribuidoras que la usan.</p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-base font-semibold text-ink">
+          ¿Cómo consiguen cuenta el vendedor y el repartidor?
+          <span class="shrink-0 font-body text-xl leading-none text-orange transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">El distribuidor los invita desde su panel de usuarios; cada uno recibe acceso solo a lo que su rol necesita.</p>
+      </details>
+
+      <details class="group py-5">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-base font-semibold text-ink">
+          ¿Qué pasa si un pedido llega mal a la tienda?
+          <span class="shrink-0 font-body text-xl leading-none text-orange transition-transform duration-200 group-open:rotate-45">+</span>
+        </summary>
+        <p class="mt-3 font-body text-sm leading-relaxed text-ink/75">La tienda puede reportarlo al confirmar la recepción; el pedido queda marcado para que el distribuidor le dé seguimiento — nada se pierde silenciosamente.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="relative overflow-hidden bg-ink" id="solicitar-demo">
+  <div class="spot-trail pointer-events-none absolute -right-10 -top-16 h-72 w-72" aria-hidden="true">
+    <span style="width:18px;height:18px;top:20%;left:60%;background:var(--color-gold);opacity:.55;"></span>
+    <span style="width:34px;height:34px;top:32%;left:78%;background:var(--color-gold);opacity:.7;"></span>
+    <span style="width:12px;height:12px;top:14%;left:42%;background:var(--color-orange);opacity:.45;"></span>
+    <span style="width:26px;height:26px;top:46%;left:52%;background:var(--color-orange);opacity:.55;"></span>
+    <span style="width:9px;height:9px;top:58%;left:70%;background:var(--color-gold);opacity:.5;"></span>
+    <span style="width:20px;height:20px;top:66%;left:38%;background:var(--color-orange);opacity:.4;"></span>
+    <span style="width:14px;height:14px;top:8%;left:70%;background:var(--color-gold);opacity:.6;"></span>
+  </div>
+
+  <div class="relative mx-auto max-w-3xl px-6 py-16 sm:px-8 md:py-24">
+    <span class="font-mono text-[13px] uppercase tracking-[0.08em] text-gold">Hablemos</span>
+    <h2 class="mt-3 font-display text-3xl font-semibold text-cream md:text-4xl">Hablemos de tu operación</h2>
+    <p class="mt-4 max-w-lg font-body text-base text-cream/70">Cuéntanos cómo trabaja tu distribuidora hoy. Te contactamos para coordinar una demo y conversar sobre el acceso anticipado.</p>
+
+    <form id="demo-form" class="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2" novalidate>
+      <div>
+        <label for="demo-nombre" class="block font-body text-sm font-medium text-cream/80">Nombre</label>
+        <input id="demo-nombre" name="nombre" type="text" required autocomplete="name"
+               class="mt-2 w-full rounded-lg border border-cream/25 bg-transparent px-4 py-3 font-body text-cream placeholder:text-cream/40 focus:border-gold focus:outline-none"
+               placeholder="Tu nombre">
+      </div>
+      <div>
+        <label for="demo-correo" class="block font-body text-sm font-medium text-cream/80">Correo</label>
+        <input id="demo-correo" name="correo" type="email" required autocomplete="email"
+               class="mt-2 w-full rounded-lg border border-cream/25 bg-transparent px-4 py-3 font-body text-cream placeholder:text-cream/40 focus:border-gold focus:outline-none"
+               placeholder="tu@correo.com">
+      </div>
+      <div class="sm:col-span-2">
+        <label for="demo-distribuidora" class="block font-body text-sm font-medium text-cream/80">Distribuidora</label>
+        <input id="demo-distribuidora" name="distribuidora" type="text" required
+               class="mt-2 w-full rounded-lg border border-cream/25 bg-transparent px-4 py-3 font-body text-cream placeholder:text-cream/40 focus:border-gold focus:outline-none"
+               placeholder="Nombre de tu negocio">
+      </div>
+      <div class="sm:col-span-2">
+        <label for="demo-mensaje" class="block font-body text-sm font-medium text-cream/80">Mensaje <span class="font-normal text-cream/50">(opcional)</span></label>
+        <textarea id="demo-mensaje" name="mensaje" rows="3"
+                  class="mt-2 w-full rounded-lg border border-cream/25 bg-transparent px-4 py-3 font-body text-cream placeholder:text-cream/40 focus:border-gold focus:outline-none"
+                  placeholder="Cuéntanos un poco de tu operación"></textarea>
+      </div>
+      <div class="sm:col-span-2">
+        <button type="submit" class="btn-pill btn-pill-primary">Enviar solicitud</button>
+      </div>
+    </form>
+
+    <div id="demo-confirmation" class="mt-10 hidden rounded-2xl border border-gold/30 bg-cream/5 p-6" role="status" tabindex="-1">
+      <p class="font-display text-lg font-semibold text-cream">Gracias — te contactaremos pronto para coordinar tu acceso.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var form = document.getElementById('demo-form');
+    var confirmation = document.getElementById('demo-confirmation');
+    if (!form || !confirmation) return;
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      form.classList.add('hidden');
+      confirmation.classList.remove('hidden');
+      confirmation.focus();
+    });
+  })();
+</script>
+
+{% endblock %}

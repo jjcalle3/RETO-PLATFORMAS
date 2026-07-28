@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Mapa de Tiendas — {{ distribuidor.name }}{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'index_catalog' %}">← Volver al Catálogo</a></p>
+<h2>Mapa de Tiendas — {{ distribuidor.name }}</h2>
+
+<div id="map" style="height:480px; width:100%; border:1px solid #ccc; border-radius:4px;"></div>
+
+{% if sin_coords %}
+<section>
+  <h3>Tiendas sin coordenadas ({{ sin_coords|length }})</h3>
+  <p>Edita cada tienda y añade latitud/longitud para que aparezcan en el mapa.</p>
+  <ul>
+    {% for t in sin_coords %}
+    <li>
+      {{ t.name }}{% if t.address %} — {{ t.address }}{% endif %}
+      <a href="{% url 'editar_tienda' t.id %}">Editar</a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const markers = {{ markers_json|safe }};
+
+  // Default center: Ecuador (Loja) if no stores have coordinates yet
+  let center = [-3.9931, -79.2042];
+  let zoom = 13;
+
+  if (markers.length > 0) {
+    const avgLat = markers.reduce((s, m) => s + m.lat, 0) / markers.length;
+    const avgLng = markers.reduce((s, m) => s + m.lng, 0) / markers.length;
+    center = [avgLat, avgLng];
+    zoom = markers.length === 1 ? 15 : 13;
+  }
+
+  const map = L.map('map').setView(center, zoom);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  }).addTo(map);
+
+  markers.forEach(m => {
+    L.marker([m.lat, m.lng])
+      .addTo(map)
+      .bindPopup(`<strong>${m.name}</strong><br>${m.address || ''}`);
+  });
+
+  if (markers.length > 1) {
+    const bounds = markers.map(m => [m.lat, m.lng]);
+    map.fitBounds(bounds, { padding: [40, 40] });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Crear Distribuidor{% endblock %}
+{% block content %}
+<p><a href="{% url 'home' %}">← Volver</a> · <a href="{% url 'invitaciones' %}">Ver invitaciones a distribuidoras →</a></p>
+<p class="form-hint">Esto crea la distribuidora y su primera cuenta de administrador (rol DISTRIBUTOR) en un solo paso.</p>
+{% url 'home' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Crear Distribuidor" cancel_url=url_cancel %}
+<p class="form-hint">¿Prefieres que la distribuidora se registre sola? <a href="{% url 'emitir_invitacion' %}">Emitir una invitación</a> en lugar de crearla manualmente.</p>
+{% endblock %}

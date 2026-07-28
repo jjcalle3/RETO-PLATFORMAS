@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Editar Categoría{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_categorias' %}">← Volver al Catálogo</a></p>
+{% url 'index_categorias' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Editar Categoría" submit_label="Actualizar" cancel_url=url_cancel %}
+{% endblock %}

@@ -1,0 +1,2156 @@
+/* ISBEN Solutions — Distribuidora: estilos base */
+
+:root {
+  --color-primary: #FB4318;
+  --color-primary-light: #FFC22F;
+  /* DESIGN.md "Outdoor legibility": orange text directly on cream/white is
+     ~3.4:1, below 4.5:1 AA — use this darkened shade for orange TEXT (not
+     fills). Verified: ~4.96:1 on cream, ~5.23:1 on white. */
+  --color-primary-text: #C93611;
+  --color-bg: #FFF8F0;
+  --color-surface: #FFFFFF;
+  --color-border: #E4D8CC;
+  --color-text: #231A16;
+  --color-muted: #6B5D55;
+  --color-error: #b3261e;
+
+  /* Order-status hues — see DESIGN.md "Semantic status colors" */
+  --color-status-pending-bg: rgba(184, 134, 11, 0.16);
+  --color-status-pending-text: #7A5A08;
+  --color-status-accepted-bg: rgba(255, 194, 47, 0.24);
+  --color-status-accepted-text: #7A5C00;
+  --color-status-dispatched-bg: rgba(30, 111, 191, 0.14);
+  --color-status-dispatched-text: #12507F;
+  --color-status-delivered-bg: rgba(14, 128, 116, 0.14);
+  --color-status-delivered-text: #0B5A51;
+  --color-status-confirmed-bg: rgba(46, 125, 50, 0.14);
+  --color-status-confirmed-text: #1E5A21;
+  --color-status-rejected-bg: rgba(107, 93, 85, 0.14);
+  --color-status-rejected-text: #4A4038;
+  --color-status-delivery-issue-bg: rgba(179, 38, 30, 0.14);
+  --color-status-delivery-issue-text: #7A1712;
+
+  /* Stock-severity hues (Inventario) — deliberately separate tokens from the
+     order-status hues above: stock severity and order status are different
+     semantic systems and shouldn't borrow each other's meaning. */
+  --color-stock-low-bg: rgba(217, 119, 6, 0.16);
+  --color-stock-low-text: #8A4B06;
+  --color-stock-out-bg: rgba(211, 47, 30, 0.16);
+  --color-stock-out-text: #8C2411;
+
+  --font-display: "Space Grotesk", "Segoe UI", Arial, Helvetica, sans-serif;
+  --font-body: "Public Sans", "Segoe UI", Arial, Helvetica, sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* craft-floor "Type": body measure 65-75ch — a page-intro paragraph on a
+   1400px-wide layout otherwise runs well past readable line length. */
+.page-intro {
+  max-width: 70ch;
+}
+
+a {
+  color: var(--color-text);
+}
+
+a:hover {
+  color: var(--color-primary-text);
+}
+
+/* DESIGN.md "Navigation": left sidebar (desktop) collapsing to a bottom
+   tab bar at <1024px. Single nav markup — this media query is what
+   relayouts it, not a second copy of the links. */
+.app-shell {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+.app-nav {
+  flex: 0 0 232px;
+  width: 232px;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--color-text);
+  padding: 20px 12px;
+  z-index: 40;
+}
+
+.app-nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.app-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: rgba(255, 248, 240, 0.78);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.app-nav a svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-nav a:hover {
+  background: rgba(255, 248, 240, 0.08);
+  color: var(--color-bg);
+}
+
+.app-nav a[aria-current="page"] {
+  background: var(--color-primary);
+  color: var(--color-text);
+}
+
+.app-nav a:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+/* Collapsible nav group (Catálogo) — native <details>/<summary> disclosure,
+   styled to match the flat nav links above. No JS. */
+.app-nav summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: rgba(255, 248, 240, 0.78);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.app-nav summary::-webkit-details-marker { display: none; }
+
+.app-nav summary > svg:first-child {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-nav summary:hover {
+  background: rgba(255, 248, 240, 0.08);
+  color: var(--color-bg);
+}
+
+.app-nav summary:focus-visible {
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+.app-nav .nav-caret {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .15s ease;
+}
+
+.app-nav details[open] > summary .nav-caret { transform: rotate(90deg); }
+
+.app-nav .nav-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0;
+}
+
+.app-nav .nav-sub a {
+  min-height: 38px;
+  padding: 8px 14px 8px 46px;
+  font-size: 0.8125rem; /* 13px — DESIGN.md "Small/muted" step */
+  font-weight: 500;
+  color: rgba(255, 248, 240, 0.66);
+}
+
+.app-nav .nav-sub a:hover {
+  background: rgba(255, 248, 240, 0.08);
+  color: var(--color-bg);
+}
+
+.app-nav .nav-sub a[aria-current="page"] {
+  background: var(--color-primary);
+  color: var(--color-text);
+}
+
+.app-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1023px) {
+  .app-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: auto;
+    height: auto;
+    overflow-x: auto;
+    overflow-y: visible;
+    border-top: 1px solid rgba(255, 248, 240, 0.12);
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .app-nav ul {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .app-nav a {
+    flex-direction: column;
+    gap: 2px;
+    min-width: 44px;
+    padding: 6px 8px;
+    font-size: 0.68rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* Bottom-bar dropdown: summary is a tab; the submenu opens upward as a
+     popover instead of stretching the horizontal row. */
+  .app-nav details.nav-group { position: relative; }
+
+  .app-nav summary {
+    flex-direction: column;
+    gap: 2px;
+    min-width: 44px;
+    padding: 6px 8px;
+    font-size: 0.68rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .app-nav .nav-caret { display: none; }
+
+  .app-nav .nav-sub {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    min-width: 180px;
+    margin: 0;
+    padding: 6px;
+    background: var(--color-text);
+    border: 1px solid rgba(255, 248, 240, 0.12);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(35, 26, 22, 0.14);
+  }
+
+  .app-nav .nav-sub a {
+    flex-direction: row;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 0.8125rem;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .app-main {
+    padding-bottom: 64px;
+  }
+}
+
+header {
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 18px 40px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 36px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.brand:hover {
+  color: var(--color-text);
+}
+
+.brand-mark {
+  display: block;
+  height: 28px;
+  width: auto;
+}
+
+.brand-word {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.brand-word em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--color-primary-text);
+}
+
+header nav {
+  flex: 1 1 auto;
+}
+
+header nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+header nav a {
+  display: inline-block;
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+header nav a:hover {
+  background-color: rgba(251, 67, 24, 0.08);
+  color: var(--color-primary-text);
+  text-decoration: none;
+}
+
+.session-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.9rem;
+  margin: 0 0 0 auto;
+  color: var(--color-text);
+  flex-shrink: 0;
+}
+
+.session-bar form {
+  display: inline;
+}
+
+.session-bar button.linklike {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary);
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+.page-section {
+  width: 100%;
+}
+
+.page-section--padded {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 32px;
+}
+
+.page-section--flush {
+  padding: 0;
+}
+
+/* Confirmed via /impeccable critique: a wide table (many columns, long
+   product names) forces the whole page to overflow horizontally on
+   narrow viewports instead of just the table scrolling. Wrapping the
+   table isolates the overflow to this container. */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 24px;
+}
+
+.table-scroll table {
+  margin-bottom: 0;
+}
+
+/* Notificaciones "Mensaje" column: uncapped, it wraps a long alert
+   sentence across 7-8 lines and blows out row height. A fixed max-width
+   keeps rows compact; .table-scroll (above) handles the resulting
+   horizontal scroll instead of the whole page overflowing. */
+.notif-col-message {
+  max-width: 360px;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin-bottom: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(35, 26, 22, 0.06);
+}
+
+thead th {
+  background: rgba(255, 194, 47, 0.16);
+  color: var(--color-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+th, td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+/* DESIGN.md "Data/Tables": IBM Plex Mono + tabular figures for table
+   data — prices, quantities, SKUs, order IDs. Aligned digits make dense
+   tables scan faster. */
+.data-mono {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Auditoría "Detalles" column — replaces the raw Python dict repr with a
+   compact key/value list. Keys stay muted/small (they're free-form field
+   names, not the point); values carry the actual information. */
+.audit-details__row {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.audit-details__row + .audit-details__row {
+  margin-top: 2px;
+}
+
+.audit-details__key {
+  flex: 0 0 auto;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.audit-details__key::after {
+  content: ":";
+}
+
+.audit-details__value {
+  color: var(--color-text);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:nth-child(even) {
+  background-color: rgba(35, 26, 22, 0.02);
+}
+
+tr:hover {
+  background-color: rgba(255, 194, 47, 0.15);
+}
+
+input[type=text], input[type=number], input[type=email],
+input[type=password], input[type=date], textarea, select {
+  width: 100%;
+  max-width: 420px;
+  padding: 8px 10px;
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(251, 67, 24, 0.15);
+}
+
+::placeholder { color: var(--color-muted); opacity: 1; }
+
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+button, input[type=submit] {
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-weight: 600;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+button:hover, input[type=submit]:hover {
+  background: var(--color-primary-light);
+}
+
+.error {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* ---------- Form cards ----------
+   Card chrome (DESIGN.md components.card) with a header / body / footer, a
+   responsive labeled-field grid, and a file dropzone. Wrap any form in
+   .form-card to get the consistent app-wide format; the partial
+   templates/partials/form_card.html renders simple field-list forms into it. */
+.form-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(35, 26, 22, 0.06);
+  max-width: 760px;
+  margin: 0 0 24px;
+  overflow: hidden;
+}
+
+.form-card__header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.form-card__header h2,
+.form-card__header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.form-card__body { padding: 24px; }
+
+.form-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-border);
+  background: rgba(35, 26, 22, 0.015);
+}
+
+/* Neutralize the global top-margins so controls sit flush inside the footer. */
+.form-card__footer button,
+.form-card__footer input[type=submit],
+.form-card__footer a { margin-top: 0; }
+
+/* Responsive labeled-field grid. Short fields sit two-up on desktop and
+   reflow to one column when narrow; :has() promotes textareas and file
+   inputs to full width without any per-field markup. */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 20px;
+}
+
+.form-grid .form-field:has(textarea),
+.form-grid .form-field:has(input[type=file]),
+.form-grid .form-field--wide { grid-column: 1 / -1; }
+
+.form-field { display: flex; flex-direction: column; min-width: 0; }
+
+.form-field > label,
+.form-field label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-text);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea { max-width: none; }
+
+.form-field__help {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+/* Checkbox rows read left-to-right: box, then label. */
+.form-field--check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.form-field--check input { width: auto; }
+.form-field--check label { margin: 0; }
+
+/* Django renders field/non-field errors as <ul class="errorlist">. */
+.errorlist {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  color: var(--color-error);
+  font-size: 12px;
+  font-weight: 600;
+}
+.form-card__body > .errorlist { margin: 0 0 16px; }
+
+/* File dropzone (DESIGN.md contrast rule: orange text uses the darkened
+   #C93611 shade, never plain #FB4318, to clear 4.5:1 on cream). */
+.file-dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 28px 20px;
+  border: 2px dashed var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+
+.file-dropzone:hover,
+.file-dropzone:focus-within,
+.file-dropzone.is-dragover {
+  border-color: var(--color-primary);
+  background: rgba(251, 67, 24, 0.04);
+}
+
+.file-dropzone svg { width: 40px; height: 40px; color: var(--color-muted); }
+
+.file-dropzone__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.file-dropzone__title span { color: #C93611; }
+
+.file-dropzone__hint { font-size: 12px; }
+
+/* Visually hidden but still focusable/clickable via the wrapping label. */
+.file-dropzone input[type=file] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Section headings inside a multi-part form card. */
+.form-section-title {
+  margin: 24px 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.form-card__body > .form-section-title:first-child { margin-top: 0; }
+
+/* A field control paired with an inline "+" action (category/brand quick-add). */
+.form-field__inline { display: flex; align-items: center; gap: 8px; }
+.form-field__inline select { flex: 1 1 auto; }
+.form-field__inline .btn-sm { margin-top: 0; flex: 0 0 auto; }
+
+.image-list {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.form-links p { margin: 0 0 8px; }
+.form-links p:last-child { margin: 0; }
+
+/* Muted helper text above a form card. */
+.form-hint {
+  max-width: 760px;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+/* Leaflet location-picker map embedded in a form card. */
+.map-picker {
+  height: 400px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  margin-top: 16px;
+}
+
+/* ---------- Auth / login (standalone page, not the .app-shell chrome) ---------- */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(1100px 520px at 100% -10%, rgba(255, 194, 47, 0.14), transparent 60%),
+    var(--color-bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 940px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(35, 26, 22, 0.16);
+  animation: auth-rise .5s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes auth-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Left branding panel — deep warm-orange gradient (kept out of the gold range
+   so white text clears contrast), white text with a subtle shadow. */
+.auth-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  color: #fff;
+  background: linear-gradient(155deg, #C0330F 0%, #E23A13 55%, #FB4318 100%);
+  text-shadow: 0 1px 2px rgba(35, 26, 22, 0.18);
+}
+
+.auth-hero__glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  top: -120px;
+  right: -100px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+}
+.auth-hero__glow--2 {
+  top: auto;
+  right: auto;
+  bottom: -140px;
+  left: -110px;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.auth-hero__brand,
+.auth-panel__brand {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+.auth-hero__brand { color: #fff; }
+.auth-hero__brand em,
+.auth-panel__brand em { font-style: normal; font-weight: 500; opacity: .82; }
+
+.auth-hero__pitch { position: relative; margin-top: auto; }
+.auth-hero__pitch h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  line-height: 1.12;
+  margin: 0 0 12px;
+}
+.auth-hero__pitch p {
+  margin: 0;
+  max-width: 34ch;
+  font-size: .95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.auth-hero__points {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.auth-hero__points li {
+  position: relative;
+  padding-left: 24px;
+  font-size: .875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.94);
+}
+.auth-hero__points li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+}
+
+/* Right form panel */
+.auth-panel {
+  padding: 44px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-panel__brand {
+  display: none;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+
+.auth-panel__head h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.6rem;
+  margin: 0 0 6px;
+}
+.auth-panel__head p {
+  margin: 0 0 22px;
+  color: var(--color-muted);
+  font-size: .9rem;
+}
+
+.auth-note,
+.auth-error {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: .85rem;
+}
+.auth-note { background: rgba(46, 125, 50, 0.10); color: #1E5A21; }
+.auth-error { background: rgba(179, 38, 30, 0.10); color: #7A1712; font-weight: 600; }
+
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+.auth-field { display: flex; flex-direction: column; }
+.auth-field label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--color-text);
+}
+.auth-field__labelrow { display: flex; align-items: baseline; justify-content: space-between; }
+.auth-field__labelrow a { font-size: 12px; font-weight: 600; color: #C93611; text-decoration: none; }
+.auth-field__labelrow a:hover { text-decoration: underline; }
+
+.auth-input { position: relative; display: flex; align-items: center; }
+.auth-input__icon {
+  position: absolute;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  color: var(--color-muted);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.auth-input input {
+  width: 100%;
+  max-width: none;
+  padding: 12px 14px 12px 40px;
+  border-radius: 8px;
+}
+.auth-input:has(.auth-eye) input { padding-right: 44px; }
+
+.auth-eye {
+  position: absolute;
+  right: 6px;
+  margin: 0;
+  padding: 6px;
+  border: none;
+  background: none;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.auth-eye:hover { color: var(--color-primary); background: none; }
+.auth-eye svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .9rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.auth-remember input { width: auto; }
+
+.auth-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 13px 18px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.auth-submit svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.auth-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(251, 67, 24, 0.28); background: var(--color-primary); }
+.auth-submit:active { transform: none; }
+
+@media (max-width: 900px) {
+  .auth-card { grid-template-columns: 1fr; max-width: 460px; }
+  .auth-hero { display: none; }
+  .auth-panel { padding: 36px 28px; }
+  .auth-panel__brand { display: inline-flex; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-card { animation: none; }
+}
+
+/* ---------- Checkout stepper ---------- */
+.stepper {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+}
+.stepper__step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: .9rem;
+  font-weight: 600;
+}
+.stepper__step:not(.stepper__step--last) { flex: 1 1 auto; }
+.stepper__step:not(.stepper__step--last)::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 2px;
+  min-width: 20px;
+  margin: 0 12px;
+  background: var(--color-border);
+}
+.stepper__marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: .8rem;
+  font-weight: 700;
+}
+.stepper__marker svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.stepper__step.is-active { color: var(--color-text); }
+.stepper__step.is-active .stepper__marker { border-color: var(--color-primary); color: var(--color-primary); }
+
+.stepper__step.is-done { color: var(--color-text); }
+.stepper__step.is-done .stepper__marker { border-color: var(--color-primary); background: var(--color-primary); color: var(--color-text); }
+.stepper__step.is-done::after { background: var(--color-primary); }
+
+.stepper__step.is-error { color: var(--color-error); }
+.stepper__step.is-error .stepper__marker { border-color: var(--color-error); color: var(--color-error); }
+
+/* Terminal rejection — a filled red node with an ✕, remaining steps stay inert. */
+.stepper__step.is-rejected { color: var(--color-error); }
+.stepper__step.is-rejected .stepper__marker { border-color: var(--color-error); background: var(--color-error); color: #fff; }
+
+/* The order lifecycle has five nodes — drop labels to markers-only on narrow
+   screens (the status pill in the heading still carries the text). */
+@media (max-width: 720px) {
+  .stepper--order .stepper__label { display: none; }
+}
+
+/* ---------- Cart ---------- */
+.cart-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px;
+  align-items: start;
+}
+.cart-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(35, 26, 22, 0.06);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto auto 40px;
+  grid-template-areas: "media info qty subtotal remove";
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+.cart-item:last-child { border-bottom: none; }
+.cart-item--static { grid-template-columns: 56px minmax(0, 1fr) auto auto; grid-template-areas: "media info qty subtotal"; }
+
+.cart-item__media {
+  grid-area: media;
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cart-item__media img { width: 100%; height: 100%; object-fit: cover; }
+.cart-item__ph { font-weight: 700; color: var(--color-muted); font-size: 1.2rem; text-transform: uppercase; }
+
+.cart-item__info { grid-area: info; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cart-item__name { font-weight: 600; }
+.cart-item__price { font-size: .8rem; color: var(--color-muted); }
+.cart-item__qty { grid-area: qty; color: var(--color-muted); }
+.cart-item__subtotal { grid-area: subtotal; font-weight: 700; }
+
+.cart-item__remove {
+  grid-area: remove;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 6px;
+  border-radius: 6px;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.cart-item__remove:hover { background: rgba(179, 38, 30, 0.10); color: var(--color-error); }
+.cart-item__remove svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* quantity stepper (− n +) */
+.qty-stepper { grid-area: qty; display: inline-flex; align-items: center; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
+.qty-stepper__btn {
+  width: 32px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.qty-stepper__btn:hover { background: rgba(251, 67, 24, 0.10); color: var(--color-primary); }
+.qty-stepper__input {
+  width: 44px;
+  max-width: 44px;
+  height: 34px;
+  padding: 0;
+  text-align: center;
+  border: none;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  border-radius: 0;
+}
+.qty-stepper__input:focus { box-shadow: none; border-color: var(--color-border); }
+.qty-stepper__input::-webkit-outer-spin-button,
+.qty-stepper__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qty-stepper__input { -moz-appearance: textfield; }
+
+/* summary sidebar */
+.cart-summary {
+  position: sticky;
+  top: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(35, 26, 22, 0.06);
+  padding: 20px;
+}
+.cart-summary h3 { margin: 0 0 14px; font-size: 1.05rem; }
+.cart-summary__row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: .9rem; color: var(--color-muted); }
+.cart-summary__row--total {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.cart-summary form { margin: 0; }
+.cart-summary__cta {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: transform .15s ease;
+}
+.cart-summary__cta:hover { background: var(--color-primary); transform: translateY(-1px); }
+.cart-summary__discard,
+.cart-summary__back {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border: none;
+  background: none;
+  color: var(--color-muted);
+  font-size: .85rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.cart-summary__discard:hover,
+.cart-summary__back:hover { color: var(--color-error); background: none; }
+.cart-summary__note { margin: 12px 0 0; font-size: .8rem; color: var(--color-muted); }
+
+.cart-empty { text-align: center; padding: 40px 20px; color: var(--color-muted); }
+.cart-empty p { margin: 0 0 16px; }
+
+.cart-errors {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  background: rgba(179, 38, 30, 0.08);
+  border: 1px solid rgba(179, 38, 30, 0.25);
+  border-radius: 8px;
+}
+.cart-errors__title { margin: 0 0 8px; font-weight: 700; color: #7A1712; }
+.cart-errors ul { margin: 0 0 12px; padding-left: 18px; color: #7A1712; }
+.cart-errors ul li { font-size: .875rem; }
+
+@media (max-width: 860px) {
+  .cart-layout { grid-template-columns: 1fr; }
+  .cart-summary { position: static; }
+}
+@media (max-width: 560px) {
+  .cart-item {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "media info remove"
+      "media qty subtotal";
+    row-gap: 10px;
+  }
+  .cart-item--static {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "media info subtotal"
+      "media qty qty";
+  }
+  .cart-item__subtotal { justify-self: end; }
+}
+
+/* Nav cart icon with count badge */
+.nav-icon-badge { position: relative; display: inline-flex; flex-shrink: 0; }
+.nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* KPI / status stat cards — dashboard "Resumen" and "Pedidos por estado".
+   Icon-in-colored-box is a deliberate, documented tradeoff (DESIGN.md
+   Decisions Log) kept for at-a-glance scanability. */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(35, 26, 22, 0.06);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(35, 26, 22, 0.1);
+}
+
+.stat-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card__icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stat-card__icon--primary { background: rgba(251, 67, 24, 0.16); color: var(--color-primary); }
+.stat-card__icon--success { background: rgba(46, 125, 50, 0.2); color: var(--color-status-confirmed-text); }
+.stat-card__icon--error   { background: rgba(179, 38, 30, 0.16); color: var(--color-error); }
+.stat-card__icon--gold    { background: rgba(255, 194, 47, 0.34); color: #7A5C00; }
+
+.stat-card__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+
+.stat-card__value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.15;
+}
+
+.stat-cards--compact .stat-card {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Filter bar — dashboard "Filtros" */
+.filter-bar {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.filter-bar__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Direct-child combinator, not "descendant" — a bare `.filter-field label`
+   also matched the checkbox <label>s buried inside the dropdown panel
+   below (they're descendants of .filter-field too), forcing them into
+   uppercase/letter-spaced/muted "field label" styling instead of normal
+   option text. */
+.filter-field > label {
+  margin-top: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.filter-field input,
+.filter-field select {
+  min-width: 140px;
+  max-width: 200px;
+}
+
+.filter-field--actions {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-field--checkbox {
+  flex-direction: row;
+  align-items: center;
+  /* .filter-bar__form bottom-aligns its items (right for label-above-input
+     fields), but a checkbox+label row is much shorter than its neighbors
+     (e.g. the Buscar/Limpiar button pair), so flex-end left it floating low
+     with a lopsided gap above it. Center it against the tallest sibling
+     in its row instead. */
+  align-self: center;
+  gap: 8px;
+}
+
+.filter-field--checkbox > label {
+  margin-top: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+.filter-field--checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+/* A free-text search field needs more room than the compact 200px cap
+   sized for short dropdown selects, so its placeholder isn't clipped. */
+.filter-field--wide input {
+  width: 280px;
+  min-width: 220px;
+  max-width: 320px;
+}
+
+/* Multi-select filter dropdowns (Vendedor/Tienda/Estado) — native
+   checkbox inputs so the form works with zero JS; the JS below only adds
+   the collapsible-panel/search/chip affordances on top. */
+.filter-dropdown {
+  position: relative;
+}
+
+.filter-dropdown__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 160px;
+  max-width: 220px;
+  padding: 8px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.filter-dropdown__toggle:hover {
+  /* Overrides the global button:hover gold background — this is a
+     dropdown control, not a primary action button. */
+  background: var(--color-bg);
+  border-color: var(--color-muted);
+}
+
+.filter-dropdown__toggle svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: transform .15s ease;
+}
+
+.filter-dropdown.is-open .filter-dropdown__toggle svg {
+  transform: rotate(180deg);
+}
+
+.filter-dropdown__toggle-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filter-dropdown__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  width: 240px;
+  max-width: calc(100vw - 32px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(35, 26, 22, 0.14);
+  overflow: hidden;
+}
+
+/* Set by JS when the panel would overflow the right edge of the viewport
+   (e.g. the rightmost filter in the row). */
+.filter-dropdown.is-flipped .filter-dropdown__panel {
+  left: auto;
+  right: 0;
+}
+
+.filter-dropdown__search {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  border-radius: 0;
+}
+
+.filter-dropdown__search:focus {
+  outline: none;
+}
+
+.filter-dropdown__options {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.filter-dropdown__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-text);
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.filter-dropdown__option:hover {
+  background: rgba(255, 194, 47, 0.14);
+}
+
+.filter-dropdown__option input {
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 194, 47, 0.18);
+  color: var(--color-text);
+  border-radius: 9999px;
+  padding: 4px 6px 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.filter-chip button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  border: none;
+  background: rgba(35, 26, 22, 0.1);
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  font-size: 0.65rem;
+  line-height: 1;
+}
+
+.filter-chip button:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Custom date picker (Desde/Hasta) — replaces the native <input type=date>
+   with a styled toggle + calendar popover, matching the filter-dropdown
+   interaction pattern. The real value lives in a hidden input so the form
+   still just submits YYYY-MM-DD with zero JS dependency for correctness. */
+.date-picker {
+  position: relative;
+}
+
+.date-picker__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 140px;
+  max-width: 180px;
+  padding: 8px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.date-picker__toggle:hover {
+  background: var(--color-bg);
+  border-color: var(--color-muted);
+}
+
+.date-picker__toggle-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+.date-picker__toggle-label.is-placeholder {
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+.date-picker__toggle svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.date-picker__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(35, 26, 22, 0.14);
+  padding: 14px;
+}
+
+.date-picker.is-flipped .date-picker__panel {
+  left: auto;
+  right: 0;
+}
+
+.date-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.date-picker__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  margin-top: 0;
+  padding: 0;
+}
+
+.date-picker__nav:hover {
+  background: var(--color-bg);
+}
+
+.date-picker__nav svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.date-picker__month-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.date-picker__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+
+.date-picker__days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.date-picker__day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  color: var(--color-text);
+  cursor: pointer;
+  margin-top: 0;
+  padding: 0;
+}
+
+.date-picker__day:hover {
+  background: rgba(255, 194, 47, 0.24);
+}
+
+.date-picker__day--today {
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1.5px var(--color-primary);
+}
+
+.date-picker__day--selected {
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.date-picker__day--selected:hover {
+  background: var(--color-primary);
+}
+
+.date-picker__day--empty {
+  visibility: hidden;
+  cursor: default;
+}
+
+.date-picker__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+}
+
+.date-picker__today-btn {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--color-primary);
+  color: var(--color-text);
+  border: none;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.date-picker__today-btn:hover {
+  background: var(--color-primary-light);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-primary);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid var(--color-primary);
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  line-height: 1.2;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+
+.btn:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-light);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: rgba(35, 26, 22, 0.04);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+}
+
+/* Inline row-action priority (Inventario "Recibir") — a full .btn pill would
+   be oversized inside a pipe-separated inline action list; weight + the
+   existing orange-on-cream TEXT shade (not a fill) is enough to make the
+   highest-value action stand out on a low/out-of-stock row. */
+.action-primary {
+  font-weight: 700;
+  color: var(--color-primary-text);
+}
+
+.invite-box {
+  background: rgba(255, 194, 47, 0.1);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 16px 0 24px;
+}
+
+.invite-box p {
+  max-width: 62ch;
+}
+
+/* Action menu — a native <details>/<summary> disclosure (zero-JS, keyboard-
+   operable by default), same popover technique as the sidebar's mobile
+   .nav-group, adapted to the light page surface instead of the ink sidebar.
+   Used to consolidate several equal-weight "create" actions behind one
+   primary button instead of a row of same-strength buttons. */
+.action-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.action-menu > summary {
+  list-style: none;
+}
+
+.action-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.action-menu__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(35, 26, 22, 0.14);
+}
+
+.action-menu__panel a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.action-menu__panel a:hover {
+  background: rgba(255, 194, 47, 0.14);
+  color: var(--color-text);
+}
+
+/* A <form> is block-level by default — this keeps a delete form's button
+   sitting inline next to "Editar |" instead of dropping to its own line. */
+.inline-form {
+  display: inline;
+}
+
+/* Destructive row action — visually distinct from "Editar" so a distributor
+   never confuses a safe edit with a permanent delete. */
+.action-link--danger {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-error);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.action-link--danger:hover {
+  color: var(--color-error);
+  opacity: 0.8;
+}
+
+/* Confirmation modal — replaces bare browser confirm() for destructive
+   actions so the app can show real consequence (e.g. cascade counts)
+   instead of a generic OS dialog. DESIGN.md reserves the "lg" (12px)
+   radius step for modals; this is the first component to use it. */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(35, 26, 22, 0.4);
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 24px 48px rgba(35, 26, 22, 0.28);
+  padding: 24px;
+}
+
+.modal__title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal__body {
+  margin: 0 0 20px;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.modal__body strong {
+  color: var(--color-text);
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal__actions .btn-danger {
+  background: var(--color-error);
+  border-color: var(--color-error);
+  color: #fff;
+}
+
+.modal__actions .btn-danger:hover {
+  background: var(--color-error);
+  border-color: var(--color-error);
+  color: #fff;
+  opacity: 0.85;
+}
+
+/* Warm, specific empty state (DESIGN.md Interaction States) — rendered
+   inside DataTables' emptyTable slot, never a bare sentence. */
+.table-empty {
+  padding: 8px 0;
+  color: var(--color-muted);
+}
+
+.table-empty strong {
+  display: block;
+  color: var(--color-text);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+tr.unread {
+  background-color: rgba(251, 67, 24, 0.06);
+  font-weight: 600;
+}
+
+footer {
+  padding: 16px 32px;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Order status pills — one hue per real order status. Needs-action states
+   (pending, delivery_issue) use the most saturated hues on purpose; dead/
+   terminal states (rejected) are deliberately muted rather than alarming.
+   See DESIGN.md "Semantic status colors" for the full rationale. */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.status-pill--pending {
+  background: var(--color-status-pending-bg);
+  color: var(--color-status-pending-text);
+}
+
+.status-pill--accepted {
+  background: var(--color-status-accepted-bg);
+  color: var(--color-status-accepted-text);
+}
+
+.status-pill--dispatched {
+  background: var(--color-status-dispatched-bg);
+  color: var(--color-status-dispatched-text);
+}
+
+.status-pill--delivered {
+  background: var(--color-status-delivered-bg);
+  color: var(--color-status-delivered-text);
+}
+
+.status-pill--confirmed {
+  background: var(--color-status-confirmed-bg);
+  color: var(--color-status-confirmed-text);
+}
+
+.status-pill--rejected {
+  background: var(--color-status-rejected-bg);
+  color: var(--color-status-rejected-text);
+}
+
+.status-pill--delivery_issue {
+  background: var(--color-status-delivery-issue-bg);
+  color: var(--color-status-delivery-issue-text);
+}
+
+/* Role badges (Usuarios page) reuse the .status-pill shape for family
+   resemblance with order-status pills, but deliberately stay off the
+   7 order-status hues (DESIGN.md reserves those for order state only).
+   Two tiers only: DISTRIBUTOR is the elevated/admin role, everything
+   else is a standard tenant user. */
+.status-pill--role-admin {
+  background: rgba(35, 26, 22, 0.08);
+  color: var(--color-text);
+}
+
+.status-pill--role-default {
+  background: rgba(107, 93, 85, 0.12);
+  color: var(--color-muted);
+}
+
+/* Stock-severity pills (Inventario) — see --color-stock-* tokens above.
+   "En stock" stays plain text (catalog/templatetags/stock_tags.py); the
+   absence of a badge is itself the "nothing to see here" signal. */
+.status-pill--stock-low {
+  background: var(--color-stock-low-bg);
+  color: var(--color-stock-low-text);
+}
+
+.status-pill--stock-out {
+  background: var(--color-stock-out-bg);
+  color: var(--color-stock-out-text);
+}
+
+/* Notification read-state pills — deliberately off the 7 order-status
+   hues (those are reserved for order state), following the same
+   off-palette convention as the role badges above. Unread reuses the
+   role-admin "elevated" tint (needs attention); read reuses the
+   role-default muted tint (settled, no action needed). */
+.status-pill--notif-unread {
+  background: rgba(35, 26, 22, 0.08);
+  color: var(--color-text);
+}
+
+.status-pill--notif-read {
+  background: rgba(107, 93, 85, 0.12);
+  color: var(--color-muted);
+}
+
+/* DESIGN.md "Motion" — brief flash when a status pill's status actually
+   changes (e.g. a delivery confirmation settling). Short duration, no
+   layout shift, skipped entirely under prefers-reduced-motion. */
+@keyframes status-pill-flash {
+  0% { box-shadow: 0 0 0 0 currentColor; }
+  40% { box-shadow: 0 0 0 5px currentColor; }
+  100% { box-shadow: 0 0 0 0 currentColor; }
+}
+
+.status-pill--flash {
+  animation: status-pill-flash 250ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-pill--flash {
+    animation: none;
+  }
+}
+
+/* DESIGN.md "Role-Specific Notes → Delivery": 44x44px minimum touch
+   targets on every tappable element — this role works outdoors, often
+   one-handed, sometimes with gloves. */
+.touch-target {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+}

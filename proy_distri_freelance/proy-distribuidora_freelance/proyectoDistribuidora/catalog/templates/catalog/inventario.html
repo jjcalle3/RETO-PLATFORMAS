@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load stock_tags %}
+{% block title %}Inventario{% endblock %}
+{% block content %}
+<h2>Inventario</h2>
+<p class="page-intro">Recibe, cuenta y ajusta el stock de cada producto, y revisa su historial de movimientos.</p>
+
+<form method="get">
+  <input type="text" name="q" value="{{ filtros.q }}" placeholder="Nombre, SKU o código de barras">
+  <select name="stock_status">
+    <option value="">Estado de stock (todos)</option>
+    <option value="in_stock" {% if filtros.stock_status == "in_stock" %}selected{% endif %}>En stock</option>
+    <option value="low" {% if filtros.stock_status == "low" %}selected{% endif %}>Stock bajo</option>
+    <option value="out" {% if filtros.stock_status == "out" %}selected{% endif %}>Agotado</option>
+  </select>
+  <input type="submit" value="Buscar">
+  <a href="{% url 'inventario' %}">Limpiar</a>
+</form>
+
+{% comment %}
+  Hidden priority column (0 = agotado, 1 = bajo, 2 = ok) so DataTables sorts
+  needs-action rows first — base.html hidden-sort-column pattern.
+{% endcomment %}
+<table class="datatable" data-order='[[0,"asc"]]' data-server-search="true">
+  <thead>
+    <tr>
+      <th class="dt-hidden">Prioridad</th>
+      <th>SKU</th>
+      <th>Producto</th>
+      <th>Stock</th>
+      <th>Umbral</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in productos %}
+    <tr{% if p.is_out_of_stock or p.total_stock < p.low_stock_threshold %} class="error"{% endif %}>
+      <td class="dt-hidden">{% if p.is_out_of_stock %}0{% elif p.total_stock < p.low_stock_threshold %}1{% else %}2{% endif %}</td>
+      <td class="data-mono">{{ p.sku }}</td>
+      <td>{{ p.name }}</td>
+      <td class="data-mono">{{ p.total_stock }}</td>
+      <td class="data-mono">{{ p.low_stock_threshold }}</td>
+      <td>{% stock_status_pill p %}</td>
+      <td>
+        <a href="{% url 'recibir_stock' p.id %}"{% if p.is_out_of_stock or p.total_stock < p.low_stock_threshold %} class="action-primary"{% endif %}>Recibir</a> |
+        <a href="{% url 'contar_stock' p.id %}">Contar</a> |
+        <a href="{% url 'ajustar_stock' p.id %}">Ajustar</a> |
+        <a href="{% url 'historial_stock' p.id %}">Historial</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">
+      {% if filtros.q or filtros.stock_status %}
+        No se encontraron productos con estos filtros. <a href="{% url 'inventario' %}">Limpiar filtros</a>
+      {% else %}
+        No hay productos en el inventario. <a href="{% url 'crear_producto' %}">Crea el primero</a>.
+      {% endif %}
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

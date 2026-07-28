@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Panel de Operador — ISBEN Solutions{% endblock %}
+{% block content %}
+<h2>Panel de Operador</h2>
+
+<section>
+  <h3>Resumen por estado</h3>
+  <ul>
+    <li>Activos: {{ totales.ACTIVE }}</li>
+    <li>Prueba: {{ totales.TRIAL }}</li>
+    <li>Suspendidos: {{ totales.SUSPENDED }}</li>
+    <li>Cancelados: {{ totales.CANCELLED }}</li>
+  </ul>
+</section>
+
+<section>
+  <h3>Distribuidores</h3>
+  {% if distribuidores %}
+  <table class="datatable">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Estado</th>
+        <th>Plan</th>
+        <th>Usuarios</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in distribuidores %}
+      <tr>
+        <td>{{ d.name }}</td>
+        <td>{{ d.email }}</td>
+        <td>{{ d.get_status_display }}</td>
+        <td>{{ d.get_plan_display }}</td>
+        <td>{{ d.user_count }}</td>
+        <td><a href="{% url 'operator_tenant_detail' d.id %}">Gestionar</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No hay distribuidores registrados.</p>
+  {% endif %}
+  <div class="page-actions">
+    <a class="btn" href="{% url 'crear_distribuidor' %}">+ Crear distribuidor</a>
+    <a class="btn btn-secondary" href="{% url 'emitir_invitacion' %}">Emitir invitación</a>
+    <a class="btn btn-secondary" href="{% url 'invitaciones' %}">Ver invitaciones</a>
+  </div>
+</section>
+{% endblock %}

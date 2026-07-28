@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Editar Distribuidor{% endblock %}
+{% block content %}
+<p><a href="{% url 'home' %}">← Volver</a></p>
+{% url 'home' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Editar Distribuidor" submit_label="Actualizar" cancel_url=url_cancel %}
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Emitir invitación{% endblock %}
+{% block content %}
+<p><a href="{% url 'home' %}">← Volver</a> · <a href="{% url 'invitaciones' %}">Ver invitaciones →</a></p>
+<p class="form-hint">La distribuidora recibirá un enlace de un solo uso, válido por 7 días, para registrarse sola.</p>
+{% url 'invitaciones' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Emitir invitación a una distribuidora" submit_label="Emitir invitación" cancel_url=url_cancel %}
+{% endblock %}

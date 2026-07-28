@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Marcas{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_catalog' %}">← Catálogo</a></p>
+<h2>Marcas</h2>
+<div class="page-actions">
+  <a class="btn" href="{% url 'crear_marca' %}">+ Nueva Marca</a>
+</div>
+<table class="datatable">
+  <thead><tr><th>Nombre</th><th>Acciones</th></tr></thead>
+  <tbody>
+    {% for m in marcas %}
+    <tr>
+      <td>{{ m.name }}</td>
+      <td><a href="{% url 'editar_marca' m.id %}">Editar</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="2">No hay marcas.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

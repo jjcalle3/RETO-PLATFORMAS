@@ -1,0 +1,38 @@
+﻿{% extends 'base.html' %}
+{% load status_tags audit_tags %}
+{% block title %}Auditoría{% endblock %}
+{% block content %}
+<h2>Registro de Auditoría</h2>
+<p><em>Solo lectura — los registros son generados automáticamente y no pueden modificarse.</em></p>
+
+<table class="datatable">
+  <thead>
+    <tr>
+      <th>Fecha y hora</th>
+      <th>Usuario</th>
+      <th>Acción</th>
+      <th>Entidad</th>
+      <th>ID</th>
+      <th>Estado anterior</th>
+      <th>Estado nuevo</th>
+      <th>Detalles</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td class="data-mono">{{ log.timestamp|date:"d/m/Y H:i:s" }}</td>
+      <td>{{ log.user|default:"—" }}</td>
+      <td>{{ log.action }}</td>
+      <td>{{ log.entity_type }}</td>
+      <td class="data-mono">{{ log.entity_id }}</td>
+      <td>{{ log.previous_status|status_pill_for_code }}</td>
+      <td>{{ log.new_status|status_pill_for_code }}</td>
+      <td>{{ log.details|format_audit_details }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8">No hay registros de auditoría.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

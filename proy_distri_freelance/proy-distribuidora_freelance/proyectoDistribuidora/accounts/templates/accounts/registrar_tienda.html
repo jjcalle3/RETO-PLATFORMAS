@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Registrar mi tienda{% endblock %}
+{% block content %}
+<p class="form-hint">Completa tus datos para crear tu cuenta y empezar a hacer pedidos a {{ distribuidor.name }}.</p>
+
+<div class="form-card">
+  <div class="form-card__header">
+    <h3>Registrar mi tienda — {{ distribuidor.name }}</h3>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-card__body">
+      {{ formulario.non_field_errors }}
+      <div class="form-grid">
+        {% for field in formulario.visible_fields %}
+          <div class="form-field">
+            {{ field.label_tag }}{{ field }}
+            {% if field.help_text %}<small class="form-field__help">{{ field.help_text }}</small>{% endif %}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+      </div>
+      {% for hidden in formulario.hidden_fields %}{{ hidden }}{% endfor %}
+      <p class="form-hint" style="margin-top:16px;"><strong>Ubicación</strong> — busca la dirección o haz clic en el mapa para colocar el marcador (opcional)</p>
+      <div id="location-picker-map" class="map-picker"></div>
+    </div>
+    <div class="form-card__footer">
+      <button type="submit">Crear mi cuenta</button>
+    </div>
+  </form>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script>window.PICKER_CFG = { lat: null, lng: null, latId: 'id_store_latitude', lngId: 'id_store_longitude' };</script>
+<script src="{% static 'js/location_picker.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Carrito — {{ store.name }}{% endblock %}
+{% block content %}
+<h2>Tu pedido — {{ store.name }}</h2>
+{% include 'partials/checkout_stepper.html' with current=1 %}
+
+{% if display_items %}
+<form method="post" class="cart-layout">
+  {% csrf_token %}
+  <div class="cart-main">
+    <div class="cart-card">
+      {% for item in display_items %}
+      <div class="cart-item">
+        <div class="cart-item__media">
+          {% if item.main_image %}
+            <img src="{{ item.main_image.image.url }}" alt="">
+          {% else %}
+            <span class="cart-item__ph" aria-hidden="true">{{ item.product.name|slice:":1" }}</span>
+          {% endif %}
+        </div>
+        <div class="cart-item__info">
+          <span class="cart-item__name">{{ item.product.name }}</span>
+          <span class="cart-item__price data-mono">${{ item.unit_price }} c/u</span>
+        </div>
+        <div class="qty-stepper">
+          <button type="button" class="qty-stepper__btn" data-step="-1" aria-label="Disminuir cantidad">−</button>
+          <input type="number" name="qty_{{ item.product.id }}" class="qty-stepper__input data-mono" value="{{ item.quantity }}" min="1">
+          <button type="button" class="qty-stepper__btn" data-step="1" aria-label="Aumentar cantidad">+</button>
+        </div>
+        <div class="cart-item__subtotal data-mono">${{ item.subtotal }}</div>
+        <button type="submit" name="remove" value="{{ item.product.id }}" class="cart-item__remove" aria-label="Quitar {{ item.product.name }}">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M8 6V4.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V6M6.5 6l.6 9a1 1 0 0 0 1 .9h3.8a1 1 0 0 0 1-.9l.6-9"/></svg>
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="page-actions">
+      <a class="btn btn-secondary" href="{% url 'explorar_productos' %}">+ Explorar y agregar productos</a>
+    </div>
+  </div>
+
+  <aside class="cart-summary">
+    <h3>Resumen</h3>
+    <div class="cart-summary__row"><span>Productos</span><span class="data-mono">{{ display_items|length }}</span></div>
+    <div class="cart-summary__row cart-summary__row--total"><span>Total</span><span class="data-mono">${{ cart_total }}</span></div>
+    <button type="submit" name="confirm" value="1" class="cart-summary__cta">Revisar y confirmar →</button>
+    <button type="submit" name="discard" value="1" class="cart-summary__discard"
+            onclick="return confirm('¿Descartar el carrito? No se guardará nada.')">Descartar carrito</button>
+    <p class="cart-summary__note">Los precios usan el descuento vigente al momento del pedido.</p>
+  </aside>
+</form>
+
+<script>
+  // Quantity steppers: adjust the adjacent input client-side. The value is
+  // persisted when the form is submitted (confirm/remove), matching the
+  // server's existing qty_<id> handling.
+  document.querySelectorAll('.qty-stepper').forEach(function (stepper) {
+    var input = stepper.querySelector('.qty-stepper__input');
+    stepper.querySelectorAll('.qty-stepper__btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var step = parseInt(btn.getAttribute('data-step'), 10);
+        var next = Math.max(1, (parseInt(input.value, 10) || 1) + step);
+        input.value = next;
+      });
+    });
+  });
+</script>
+{% else %}
+<div class="cart-empty">
+  <p>Sin productos aún. Agrega al menos uno para poder confirmar.</p>
+  <a class="btn" href="{% url 'explorar_productos' %}">+ Explorar productos</a>
+  <form method="post" style="margin-top:12px;">
+    {% csrf_token %}
+    <button type="submit" name="discard" value="1" class="cart-summary__discard"
+            onclick="return confirm('¿Descartar el carrito?')">Descartar carrito</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Editar Confirmación{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_deliveries' %}">← Cola de entregas</a></p>
+<p>Pedido: <strong>{{ confirmacion.order }}</strong></p>
+
+{% if confirmacion.order.store.latitude and confirmacion.order.store.longitude %}
+<p>
+  <a href="https://www.google.com/maps/dir/?api=1&destination={{ confirmacion.order.store.latitude }},{{ confirmacion.order.store.longitude }}"
+     target="_blank" rel="noopener noreferrer">Navegar a {{ confirmacion.order.store.name }}</a>
+</p>
+{% endif %}
+
+{% url 'index_deliveries' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Editar Confirmación" submit_label="Actualizar" cancel_url=url_cancel %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% comment %}
+Order lifecycle stepper. Renders the five happy-path states of an order and
+marks the current one, with branches for REJECTED (terminal) and
+DELIVERY_ISSUE (error on the final step). State logic lives in the
+`order_steps` tag (orders/templatetags/status_tags.py).
+
+Params (via {% include ... with %}):
+  status — the order's status code (e.g. pedido.status)
+{% endcomment %}
+{% load status_tags %}
+{% order_steps status as steps %}
+<ol class="stepper stepper--order" aria-label="Estado del pedido">
+  {% for step in steps %}
+  <li class="stepper__step{% if forloop.last %} stepper__step--last{% endif %} is-{{ step.state }}">
+    <span class="stepper__marker" aria-hidden="true">
+      {% if step.state == 'done' %}<svg viewBox="0 0 20 20"><path d="M5 10.5l3.5 3.5L15 6"/></svg>{% elif step.state == 'error' %}!{% elif step.state == 'rejected' %}✕{% else %}{{ step.n }}{% endif %}
+    </span>
+    <span class="stepper__label">{{ step.label }}</span>
+  </li>
+  {% endfor %}
+</ol>

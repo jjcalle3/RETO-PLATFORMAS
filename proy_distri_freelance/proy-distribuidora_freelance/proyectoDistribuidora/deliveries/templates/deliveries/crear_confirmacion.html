@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Confirmar Entrega{% endblock %}
+{% block content %}
+<p><a href="{% url 'index_deliveries' %}">← Cola de entregas</a></p>
+{% url 'index_deliveries' as url_cancel %}
+{% include 'partials/form_card.html' with formulario=formulario title="Confirmar Entrega" submit_label="Confirmar Entrega" cancel_url=url_cancel multipart=True %}
+{% endblock %}
