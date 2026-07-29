@@ -1,0 +1,91 @@
+/* ============================================================
+   TEMA "MANIFIESTO DE BODEGA" — override de identidad visual
+   ISBEN Solutions / Distribuidora
+
+   CÓMO USARLO (no rompe nada de lo que ya existe):
+   1. Deja static/css/styles.css TAL COUAL está (no lo borres).
+   2. Guarda este archivo como: static/css/theme-manifest.css
+   3. En templates/base.html, justo DESPUÉS de la línea que carga
+      styles.css, agrega:
+        <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/theme-manifest.css' %}">
+   4. Recarga la página. Como este archivo se carga DESPUÉS,
+      sus reglas ganan sobre las de styles.css (mismo principio
+      de "cascada" de CSS), así que no hay que tocar ni una sola
+      plantilla HTML de las 73 que ya existen.
+   ============================================================ */
+
+:root {
+  /* Paleta nueva: de "cafetería cálida" (naranja/crema) pasamos a
+     "manifiesto de bodega/logística" (ámbar de señalización + tinta
+     azul-carbón), con el mismo nivel de contraste ya validado en
+     DESIGN.md, solo con otro tono. */
+  --color-primary: #E8A100;
+  --color-primary-light: #FFD166;
+  --color-primary-text: #8A5B00; /* AA sobre crema/blanco, igual que el original */
+
+  --color-bg: #F3F1EA;
+  --color-surface: #FFFFFF;
+  --color-border: #D9D2C2;
+  --color-text: #1B2733;   /* tinta azul-carbón en vez de marrón-negro */
+  --color-muted: #55606B;
+
+  --font-display: "Barlow Semi Condensed", "Space Grotesk", "Segoe UI", Arial, sans-serif;
+}
+
+/* --- Firma visual: los números de pedido / SKU parecen un sello de
+   manifiesto de carga (borde punteado, ligera rotación, monoespaciado).
+   Esto es lo único "llamativo" del rediseño — el resto se mantiene
+   sobrio a propósito. */
+.order-card h3,
+.order-detail h2,
+h2 .order-number,
+.pedido-numero {
+  position: relative;
+}
+
+.manifest-tag,
+.order-card .badge-id,
+.pedido-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 3px 10px;
+  border: 1.5px dashed var(--color-text);
+  border-radius: 3px;
+  background: var(--color-surface);
+  transform: rotate(-1deg);
+}
+
+/* Navegación lateral: misma estructura, tono ámbar en vez de naranja */
+.app-nav a[aria-current="page"],
+.app-nav .nav-sub a[aria-current="page"] {
+  background: var(--color-primary);
+  color: var(--color-text);
+}
+
+/* Botones primarios */
+.btn-primary,
+button[type="submit"],
+input[type="submit"] {
+  background: var(--color-primary) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* Encabezados con la nueva tipografía condensada — le da carácter de
+   "rótulo de bodega/andén de carga" sin perder legibilidad */
+h1, h2, h3, .app-nav a, .app-nav summary {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+/* Tarjetas: esquinas un poco más rectas (menos "app amigable", más
+   "ficha operativa") */
+.card, .form-card, .order-card {
+  border-radius: 6px !important;
+}
